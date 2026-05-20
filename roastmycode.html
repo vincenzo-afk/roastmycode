@@ -548,7 +548,7 @@
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- NAV BAR -->
   <!-- ═══════════════════════════════════════════════════════════════ -->
-  <nav class="fixed top-0 left-0 right-0 z-50" style="background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,45,85,0.2); box-shadow: 0 0 20px rgba(255,45,85,0.05);">
+  <nav class="fixed top-0 left-0 right-0 z-50" style="background: color-mix(in srgb, var(--bg-primary) 80%, transparent); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,45,85,0.2); box-shadow: 0 0 20px rgba(255,45,85,0.05);">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <!-- Left: Logo -->
       <div class="flex items-center gap-2">
@@ -565,16 +565,14 @@
         </div>
       </div>
       <!-- Right: Actions -->
-      <div class="flex items-center gap-3">
-        <button onclick="toggleApiKeyBanner()" class="p-2 rounded-lg border text-sm flex items-center gap-1.5" style="border-color: var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.25s;" aria-label="Configure API Key">
-          🔑 <span class="hidden md:inline font-semibold">API KEY</span>
-        </button>
+      <div class="flex items-center gap-3">        <a href="https://github.com/vincenzo-afk/roastmycode" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm" style="border: 1px solid var(--border-subtle); color: var(--text-muted); text-decoration: none; transition: all 0.25s;" aria-label="GitHub Repo">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span class="font-semibold">Source</span>
+        </a>
         <button onclick="toggleTheme()" class="p-2 rounded-lg border" style="border-color: var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.25s;" aria-label="Toggle dark/light mode">
           <span id="theme-icon">🌙</span>
         </button>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm" style="border: 1px solid var(--border-subtle); color: var(--text-muted); text-decoration: none; transition: all 0.25s;" aria-label="Star on GitHub">
-          <span>⭐</span> Star
-        </a>
+
         <button onclick="showHallOfShame()" class="px-3 py-1.5 rounded-lg text-sm font-semibold" style="border: 1px solid var(--accent-red); color: var(--accent-red); background: transparent; cursor: pointer; transition: all 0.25s;" aria-label="Open Hall of Shame">
           HALL OF SHAME
         </button>
@@ -582,33 +580,6 @@
     </div>
   </nav>
 
-  <!-- ═══════════════════════════════════════════════════════════════ -->
-  <!-- API KEY SETUP BANNER -->
-  <!-- ═══════════════════════════════════════════════════════════════ -->
-  <div id="api-key-banner" class="max-w-5xl mx-auto px-4 pt-20 pb-0" style="display: none;">
-    <div class="glow-border rounded-xl p-4 border-dashed" style="background: var(--bg-card); border-color: var(--accent-orange); border-style: dashed; border-width: 1px; box-shadow: 0 0 15px rgba(255,107,43,0.15);">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-mono-custom text-lg" style="background: rgba(255,107,43,0.1); border: 1px solid rgba(255,107,43,0.3); color: var(--accent-orange);">
-            🔑
-          </div>
-          <div>
-            <div class="font-mono-custom text-sm font-semibold" style="color: var(--text-primary);">
-              GROQ API KEY CONFIGURATION
-            </div>
-            <div class="font-mono-custom text-xs" style="color: var(--text-muted); margin-top: 2px;">
-              Required for running locally (file:///). Your key is stored in memory and sent only to Groq. 
-              <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-white" style="color: var(--accent-cyan);">Get free key</a>
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <input type="password" id="api-key-input" placeholder="gsk_..." class="flex-1 sm:w-64 px-3 py-1.5 rounded bg-black border font-mono text-sm text-white" style="border-color: var(--border-subtle); outline: none; background: rgba(0,0,0,0.5);" />
-          <button onclick="saveApiKey()" class="px-4 py-1.5 rounded font-mono text-xs font-bold text-black" style="background: var(--accent-orange); cursor: pointer; transition: all 0.25s;">SAVE</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- HERO SECTION -->
@@ -834,8 +805,6 @@
     let leaderboard = [];
     let abortController = null;
     let cardColorVariant = "red";
-    let groqApiKey = "";
-
     // ─── ROAST MODES DATA ──────────────────────────────────────────
     const ROAST_MODES = [
       { id: "funny",        name: "Funny",           icon: "🔥", accent: "#ff6b2b", tagline: "Chaos-sponsored variable naming" },
@@ -1531,44 +1500,12 @@ console.log(n([1,2,3,4,5], 3));`,
       animatePageLoad();
       setupKeyboardNav();
       
-      // Auto-open API key banner if run from file:/// protocol
-      if (window.location.protocol === 'file:') {
-        document.getElementById('api-key-banner').style.display = 'block';
-      }
     }
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
       init();
-    }
-
-    // ─── API KEY CONFIGURATION ───────────────────────────────────────
-    function toggleApiKeyBanner() {
-      const banner = document.getElementById('api-key-banner');
-      if (banner.style.display === 'none') {
-        banner.style.display = 'block';
-        const input = document.getElementById('api-key-input');
-        input.value = groqApiKey;
-      } else {
-        banner.style.display = 'none';
-      }
-    }
-
-    function saveApiKey() {
-      const input = document.getElementById('api-key-input');
-      const key = input.value.trim();
-      if (!key) {
-        showToast('🔑 Please enter a valid API Key.', 'error');
-        return;
-      }
-      if (!key.startsWith('gsk_')) {
-        showToast('🔑 Invalid Groq API key format. Should start with gsk_', 'error');
-        return;
-      }
-      groqApiKey = key;
-      showToast('🔑 API Key updated in memory successfully!', 'success');
-      document.getElementById('api-key-banner').style.display = 'none';
     }
 
     // ─── SETUP MODE BUTTONS ──────────────────────────────────────
@@ -1877,46 +1814,22 @@ console.log(n([1,2,3,4,5], 3));`,
     async function streamRoast(code, mode, language) {
       abortController = new AbortController();
 
-      let response;
-      if (groqApiKey) {
-        const systemPrompt = SYSTEM_PROMPTS[mode] || SYSTEM_PROMPTS.funny;
-        const userPrompt = buildUserPrompt(code, language || 'auto');
-        
-        response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${groqApiKey}`
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt }
-            ],
-            max_tokens: 1500,
-            stream: true,
-            temperature: 0.9
-          }),
-          signal: abortController.signal
-        });
-      } else {
-        if (window.location.protocol === 'file:') {
-          throw { type: 'custom', message: 'LOCAL EXECUTION DETECTED: You must provide a Groq API Key in the setup banner at the top of the page to initiate roasts when opening this page locally.' };
-        }
-        response = await fetch("/api/roast", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            code: code,
-            mode: mode,
-            language: language
-          }),
-          signal: abortController.signal
-        });
+      if (window.location.protocol === 'file:') {
+        throw { type: 'custom', message: 'LOCAL EXECUTION DETECTED: This page must be deployed to Vercel (or another server) to initiate roasts.' };
       }
+
+      const response = await fetch("/api/roast", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          code: code,
+          mode: mode,
+          language: language
+        }),
+        signal: abortController.signal
+      });
 
       if (!response.ok) {
         throw { type: 'api', status: response.status, statusText: response.statusText };
@@ -2355,51 +2268,25 @@ console.log(n([1,2,3,4,5], 3));`,
         - <fix 2>
         - <fix 3>`;
 
-        let response;
-        if (groqApiKey) {
-          const userMessage = `Please refactor this ${currentLanguage || 'auto'} code:\n\n\`\`\`${currentLanguage !== 'auto' ? currentLanguage : ''}\n${code}\n\`\`\``;
-
-          response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${groqApiKey}`
-            },
-            body: JSON.stringify({
-              model: "llama-3.3-70b-versatile",
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userMessage }
-              ],
-              max_tokens: 2000,
-              temperature: 0.7
-            })
-          });
-        } else {
-          if (window.location.protocol === 'file:') {
-            throw { type: 'custom', message: 'LOCAL EXECUTION DETECTED: You must provide a Groq API Key in the setup banner at the top of the page to perform emergency refactoring when opening this page locally.' };
-          }
-          response = await fetch("/api/refactor", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              code: code,
-              language: currentLanguage
-            })
-          });
+        let response
+        if (window.location.protocol === 'file:') {
+          throw { type: 'custom', message: 'LOCAL EXECUTION DETECTED: This page must be deployed to Vercel (or another server) to perform refactoring. Open the deployed version instead.' };
         }
+        response = await fetch("/api/refactor", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: code,
+            language: currentLanguage
+          })
+        });
 
         if (!response.ok) throw { type: 'api', status: response.status };
 
         const data = await response.json();
-        let text = "";
-        if (groqApiKey) {
-          text = data.choices[0]?.message?.content || '';
-        } else {
-          text = data.content || '';
-        }
+        const text = data.content || '';
 
         renderRefactorPanel(text, code);
 
@@ -2797,6 +2684,7 @@ console.log(n([1,2,3,4,5], 3));`,
 
     // ─── ERROR HANDLING ──────────────────────────────────────────
     function handleApiError(err) {
+      console.error('Roast error details:', err);
       let msg;
       if (err.type === 'custom') {
         msg = err.message;
@@ -2804,18 +2692,20 @@ console.log(n([1,2,3,4,5], 3));`,
         if (err.status === 429) {
           msg = "GROQ API SAYS: Slow down, you absolute goblin. Try again in 60 seconds.";
         } else if (err.status === 401) {
-          msg = "INVALID API KEY DETECTED. Your key is as valid as this code.";
+          msg = "INVALID API KEY DETECTED. The server API key is invalid.";
         } else if (err.status >= 500) {
-          msg = "THE AI IS OVERWHELMED BY YOUR CODE'S WRONGNESS. Try again.";
-        } else if (err.status === 0 || err.message?.includes('fetch')) {
-          msg = "NETWORK ERROR: The AI refused to connect. Probably scared of your code.";
+          msg = "SERVER ERROR: The AI backend is overwhelmed. Try again in a moment.";
+        } else if (err.status === 0 || err.message?.includes('fetch') || err instanceof TypeError) {
+          msg = "NETWORK ERROR: Cannot reach the roast server. Is the app deployed? Check console (F12) for details.";
         } else {
           msg = `API ERROR (${err.status}): The roast machine encountered an error.`;
         }
       } else if (err.name === 'AbortError') {
         msg = "Roast cancelled. The AI chickened out.";
+      } else if (err.message) {
+        msg = `ERROR: ${err.message}`;
       } else {
-        msg = "An error occurred. The universe is protecting you from the truth.";
+        msg = "An unknown error occurred. Check the browser console (F12) for details.";
       }
 
       showError(msg);
