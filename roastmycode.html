@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROASTMYCODE — AI-Powered Code Judgment System</title>
+  <meta name="description" content="Submit your code for brutal AI-powered roasting. Multiple personalities, pain scores, and shareable roast cards.">
+
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Prism.js syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js" defer></script>
+
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+  <!-- Lucide Icons (ESM) -->
+  <script type="module">
+    import { createIcons, icons } from 'https://cdn.jsdelivr.net/npm/lucide@latest/dist/esm/lucide.js';
+    window.addEventListener('DOMContentLoaded', () => {
+      createIcons({ icons });
+      setTimeout(() => createIcons({ icons }), 500);
+    });
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── CSS CUSTOM PROPERTIES ─────────────────────────────────── */
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #0f0f1a;
+      --bg-card: #13131f;
+      --bg-card-hover: #1a1a2e;
+      --border-glow: #ff2d55;
+      --border-subtle: #1e1e2e;
+      --text-primary: #e2e2f0;
+      --text-muted: #6b6b8a;
+      --text-faint: #3d3d5c;
+      --accent-red: #ff2d55;
+      --accent-cyan: #00d4ff;
+      --accent-green: #00ff88;
+      --accent-orange: #ff6b2b;
+      --accent-purple: #a855f7;
+      --accent-yellow: #ffd700;
+      --terminal-green: #39ff14;
+      --bg-card-border: #1e1e2e;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f0f0f8;
+      --bg-secondary: #e8e8f0;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f5f5ff;
+      --border-glow: #ff2d55;
+      --border-subtle: #d0d0e0;
+      --text-primary: #1a1a2e;
+      --text-muted: #6b6b8a;
+      --text-faint: #9d9db5;
+      --bg-card-border: #d0d0e0;
+    }
+
+    /* ─── BASE STYLES ─────────────────────────────────────────────── */
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Grid background */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(255,45,85,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,45,85,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* ─── SCROLLBAR ───────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--text-faint); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ─── CUSTOM CLASSES ──────────────────────────────────────────── */
+    .font-mono-custom { font-family: 'Share Tech Mono', monospace; }
+
+    .glow-border {
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .glow-border:hover {
+      border-color: var(--border-glow);
+      box-shadow: 0 0 20px rgba(255,45,85,0.15), 0 0 40px rgba(255,45,85,0.05);
+    }
+    .glow-border-accent { border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255,45,85,0.15), 0 0 40px rgba(255,45,85,0.05); }
+
+    .text-glow { text-shadow: 0 0 20px currentColor; }
+    .text-glow-red { text-shadow: 0 0 20px rgba(255,45,85,0.5); }
+    .text-glow-cyan { text-shadow: 0 0 20px rgba(0,212,255,0.5); }
+    .text-glow-green { text-shadow: 0 0 20px rgba(0,255,136,0.5); }
+
+    /* ─── ANIMATED GRADIENT TEXT ──────────────────────────────────── */
+    .gradient-text {
+      background: linear-gradient(270deg, #ff2d55, #00d4ff, #a855f7, #ff2d55);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-shift 4s ease infinite;
+    }
+
+    /* ─── KEYFRAMES ───────────────────────────────────────────────── */
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes scan {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes slide-up {
+      0% { transform: translateY(20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slide-in-right {
+      0% { transform: translateX(100px); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    @keyframes scale-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @keyframes fill-bar {
+      0% { width: 0%; }
+    }
+
+    @keyframes pain-meter {
+      0% { width: 0%; }
+    }
+
+    @keyframes chaos-fill {
+      0% { width: 0%; }
+    }
+
+    @keyframes counter-up {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes screen-flash {
+      0% { background-color: rgba(255,45,85,0); }
+      20% { background-color: rgba(255,45,85,0.2); }
+      40% { background-color: rgba(255,45,85,0); }
+      60% { background-color: rgba(255,45,85,0.15); }
+      80% { background-color: rgba(255,45,85,0); }
+      100% { background-color: rgba(255,45,85,0.1); }
+    }
+
+    .typing-cursor::after {
+      content: '▋';
+      animation: blink-cursor 1s step-end infinite;
+      color: var(--terminal-green);
+    }
+
+    .pulsing-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse-glow 1.5s ease-in-out infinite;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .pulsing-dot.red { background-color: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
+    .pulsing-dot.green { background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+
+    /* ─── MODE BUTTONS ────────────────────────────────────────────── */
+    .mode-btn {
+      position: relative;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+    .mode-btn:hover {
+      border-color: var(--text-faint);
+      background: var(--bg-card-hover);
+      transform: translateY(-1px);
+    }
+    .mode-btn.active {
+      border-color: var(--accent-red);
+      background: rgba(255,45,85,0.08);
+      color: var(--text-primary);
+      box-shadow: 0 0 15px rgba(255,45,85,0.15);
+      transform: scale(1.02);
+    }
+    .mode-btn .mode-icon { margin-right: 6px; font-size: 16px; }
+
+    /* ─── LANGUAGE PILLS ──────────────────────────────────────────── */
+    .lang-pill {
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      transition: all 0.25s ease;
+    }
+    .lang-pill:hover { border-color: var(--text-faint); color: var(--text-primary); background: rgba(255,255,255,0.03); }
+    .lang-pill.active { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0,212,255,0.08); box-shadow: 0 0 10px rgba(0,212,255,0.1); }
+
+    /* ─── CODE TEXTAREA ───────────────────────────────────────────── */
+    .code-editor-wrapper {
+      position: relative;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .code-editor-wrapper:focus-within {
+      border-color: var(--accent-red);
+      box-shadow: 0 0 15px rgba(255,45,85,0.1);
+    }
+    .code-editor-wrapper textarea {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: none;
+      outline: none;
+      resize: vertical;
+      width: 100%;
+      min-height: 250px;
+      padding: 16px;
+      padding-left: 56px;
+      tab-size: 2;
+    }
+    .line-numbers {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 44px;
+      padding: 16px 8px;
+      text-align: right;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-faint);
+      background: rgba(0,0,0,0.3);
+      border-right: 1px solid var(--border-subtle);
+      user-select: none;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* ─── METRICS CARDS ───────────────────────────────────────────── */
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .metric-card.visible { opacity: 1; transform: translateY(0); }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-glow);
+      box-shadow: 0 0 20px rgba(255,45,85,0.15), 0 0 40px rgba(255,45,85,0.05);
+    }
+    .metric-card .metric-fill {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-secondary);
+      overflow: hidden;
+      position: relative;
+    }
+    .metric-card .metric-fill .fill-bar {
+      height: 100%;
+      border-radius: 3px;
+      width: 0%;
+      transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ─── ROAST CARD (hidden off-screen) ──────────────────────────── */
+    #roast-card-element {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 800px;
+      height: 450px;
+      background: #0a0a0f;
+      font-family: 'Share Tech Mono', monospace;
+      color: #e2e2f0;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    /* ─── SCANNING ANIMATION ──────────────────────────────────────── */
+    .scan-line {
+      display: block;
+      opacity: 0;
+      animation: slide-up 0.3s ease forwards;
+    }
+    .scan-line.done { color: var(--accent-green); }
+    .scan-line .scan-prefix { color: var(--accent-green); }
+
+    /* ─── PAIN METER ──────────────────────────────────────────────── */
+    .pain-meter-track {
+      width: 100%;
+      height: 24px;
+      background: linear-gradient(to right, var(--accent-green), #85e000, #ffd700, var(--accent-orange), var(--accent-red));
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pain-meter-fill {
+      height: 100%;
+      background: transparent;
+      position: absolute;
+      right: 0;
+      top: 0;
+      backdrop-filter: brightness(0.5);
+      transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .pain-meter-needle {
+      position: absolute;
+      top: -6px;
+      width: 4px;
+      height: calc(100% + 12px);
+      background: white;
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(255,255,255,0.2);
+      transition: left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2;
+    }
+    .pain-meter-needle::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -4px;
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    /* ─── HALL OF SHAME ───────────────────────────────────────────── */
+    .hall-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      display: none;
+      overflow-y: auto;
+    }
+    .hall-overlay.open { display: block; animation: slide-up 0.3s ease; }
+    .hall-panel {
+      max-width: 900px;
+      margin: 60px auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .hall-tab {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Share Tech Mono', monospace;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.25s;
+    }
+    .hall-tab.active {
+      background: rgba(255,45,85,0.1);
+      border-color: var(--accent-red);
+      color: var(--text-primary);
+    }
+
+    /* ─── VERDICT BANNER ──────────────────────────────────────────── */
+    .verdict-banner { margin-top: 24px; padding: 20px 24px; border-radius: 12px; border: 1px solid; }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .mode-btn { font-size: 12px; padding: 8px 12px; }
+      .lang-pill { font-size: 11px; padding: 4px 10px; }
+      .code-editor-wrapper textarea { font-size: 12px; min-height: 180px; padding-left: 40px; }
+      .line-numbers { width: 32px; font-size: 12px; padding: 12px 4px; }
+      .metric-card { padding: 12px; }
+      .hall-panel { margin: 20px 12px; padding: 20px; }
+      #roast-card-element { transform: scale(0.5); transform-origin: top left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .scan-line { opacity: 1; }
+      .metric-card { opacity: 1; transform: none; }
+      .pain-meter-fill, .pain-meter-needle { transition: none; }
+      .metric-card .metric-fill .fill-bar { transition: none; width: var(--target-width, 0%) !important; }
+    }
+
+    /* ─── CRT FLICKER ─────────────────────────────────────────────── */
+    .crt-flicker {
+      animation: flicker 0.15s steps(2) 3;
+    }
+
+    /* ─── ERROR SHAKE ─────────────────────────────────────────────── */
+    .shake-error {
+      animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    /* ─── CATASTROPHIC FLASH ──────────────────────────────────────── */
+    .catastrophic-flash {
+      animation: screen-flash 0.6s ease;
+    }
+
+    /* ─── TOAST ───────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 16px 24px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      z-index: 200;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: slide-up 0.3s ease;
+      pointer-events: none;
+    }
+    .toast.success { border-color: var(--accent-green); box-shadow: 0 0 20px rgba(0,255,136,0.1); }
+    .toast.error { border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255,45,85,0.1); }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- NAV BAR -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <nav class="fixed top-0 left-0 right-0 z-50" style="background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,45,85,0.2); box-shadow: 0 0 20px rgba(255,45,85,0.05);">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <!-- Left: Logo -->
+      <div class="flex items-center gap-2">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="4" y="15" fill="#ff2d55" font-size="11" font-family="monospace" font-weight="bold">{</text>
+          <text x="11" y="15" fill="#ff2d55" font-size="11" font-family="monospace" font-weight="bold">}</text>
+          <rect x="9" y="8" width="4" height="6" rx="1" fill="#ff2d55" opacity="0.8"/>
+          <rect x="10" y="6" width="2" height="4" rx="1" fill="#ff6b2b" opacity="0.6"/>
+          <rect x="10" y="14" width="2" height="4" rx="1" fill="#ff6b2b" opacity="0.4"/>
+        </svg>
+        <div>
+          <span class="gradient-text text-xl font-bold tracking-tight" style="-webkit-text-fill-color: transparent;">ROASTMYCODE</span>
+          <span class="text-xs text-muted hidden sm:inline ml-2" style="color: var(--text-faint); font-family: 'Share Tech Mono', monospace;">// AI-Powered Code Judgment System</span>
+        </div>
+      </div>
+      <!-- Right: Actions -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleTheme()" class="p-2 rounded-lg border" style="border-color: var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.25s;" aria-label="Toggle dark/light mode">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm" style="border: 1px solid var(--border-subtle); color: var(--text-muted); text-decoration: none; transition: all 0.25s;" aria-label="Star on GitHub">
+          <span>⭐</span> Star
+        </a>
+        <button onclick="showHallOfShame()" class="px-3 py-1.5 rounded-lg text-sm font-semibold" style="border: 1px solid var(--accent-red); color: var(--accent-red); background: transparent; cursor: pointer; transition: all 0.25s;" aria-label="Open Hall of Shame">
+          HALL OF SHAME
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- HERO SECTION -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="max-w-5xl mx-auto px-4 pt-24 pb-4 text-center">
+    <pre id="ascii-banner" class="font-mono-custom text-xs leading-tight" style="color: var(--terminal-green); opacity: 0.4; max-width: 100%; overflow: hidden; white-space: pre; line-height: 1.1;"></pre>
+
+    <h1 class="text-4xl sm:text-5xl font-bold mt-6 mb-3" style="color: var(--text-primary);">YOUR CODE DESERVES TO SUFFER</h1>
+    <p class="text-lg" style="color: var(--text-muted);">Paste your code. Face judgment. Achieve enlightenment — or despair.</p>
+
+    <!-- Stats Bar -->
+    <div class="flex flex-wrap justify-center gap-4 sm:gap-8 mt-6 mb-2">
+      <div class="font-mono-custom text-sm" style="color: var(--text-faint);">
+        [<span id="stat-roasts" style="color: var(--accent-red);">0</span> ROASTS DELIVERED]
+      </div>
+      <div class="font-mono-custom text-sm" style="color: var(--text-faint);">
+        [CODE CRIMES: <span id="stat-crimes" style="color: var(--accent-orange);">CATASTROPHIC</span>]
+      </div>
+      <div class="font-mono-custom text-sm" style="color: var(--text-faint);">
+        [HUMANITY STATUS: <span id="stat-humanity" style="color: var(--accent-purple);">QUESTIONED</span>]
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- CODE INPUT PANEL -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="max-w-5xl mx-auto px-4 pb-8">
+    <div class="glow-border rounded-2xl p-4 sm:p-6" style="background: var(--bg-card);">
+
+      <!-- Mode Selector -->
+      <div class="mb-4">
+        <label class="font-mono-custom text-xs mb-2 block" style="color: var(--text-faint);">// SELECT ROAST MODE</label>
+        <div id="mode-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label="Roast mode selection"></div>
+      </div>
+
+      <!-- Language Selector -->
+      <div class="mb-4">
+        <label class="font-mono-custom text-xs mb-2 block" style="color: var(--text-faint);">// LANGUAGE</label>
+        <div id="lang-selector" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Code Editor -->
+      <div class="code-editor-wrapper">
+        <div id="line-numbers" class="line-numbers" aria-hidden="true">1</div>
+        <textarea id="code-input" placeholder="// Paste your code here. We won't judge you.
+// (We absolutely will.)" spellcheck="false" aria-label="Code editor"></textarea>
+      </div>
+
+      <!-- Char Counter -->
+      <div class="flex justify-end mt-1">
+        <span id="char-counter" class="font-mono-custom text-xs" style="color: var(--text-faint);">[0 / 5000 chars]</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap gap-3 mt-4">
+        <button id="btn-roast" onclick="initiateRoast()" class="flex-1 min-w-[160px] py-3 px-6 rounded-xl font-bold text-sm flex items-center justify-center gap-2" style="background: var(--accent-red); color: white; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(255,45,85,0.3);" aria-label="Initiate roast">
+          ▶ INITIATE ROAST
+        </button>
+        <button id="btn-refactor" onclick="initiateRefactor()" class="py-3 px-5 rounded-xl font-semibold text-sm flex items-center gap-2" style="background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; transition: all 0.3s;" aria-label="Emergency refactor">
+          ⚡ REFACTOR
+        </button>
+        <button onclick="surpriseMe()" class="py-3 px-5 rounded-xl font-semibold text-sm flex items-center gap-2" style="background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); cursor: pointer; transition: all 0.3s;" aria-label="Surprise me with cursed code">
+          🎲 SURPRISE
+        </button>
+        <button onclick="clearEditor()" class="py-3 px-4 rounded-xl flex items-center justify-center" style="background: transparent; border: 1px solid var(--border-subtle); color: var(--text-faint); cursor: pointer; transition: all 0.3s;" aria-label="Clear editor">
+          📋
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SCANNING ANIMATION -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="scanning-section" class="max-w-5xl mx-auto px-4 pb-4" style="display: none;">
+    <div class="glow-border rounded-2xl p-6" style="background: var(--bg-card); border-color: var(--terminal-green); box-shadow: 0 0 15px rgba(57,255,20,0.05);">
+      <div id="scanning-text" class="font-mono-custom text-sm leading-relaxed" style="color: var(--terminal-green);"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- RESULTS PANEL -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="results-section" class="max-w-5xl mx-auto px-4 pb-8" style="display: none;" aria-live="polite" aria-atomic="true">
+    <div id="results-container"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- HALL OF SHAME OVERLAY -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div id="hall-overlay" class="hall-overlay" onclick="if(event.target===this)hideHallOfShame()" role="dialog" aria-modal="true" aria-label="Hall of Shame">
+    <div class="hall-panel" style="background: var(--bg-card); border-color: var(--border-subtle);">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold gradient-text" style="-webkit-text-fill-color: transparent;">🏆 HALL OF SHAME</h2>
+        <button onclick="hideHallOfShame()" class="p-2 rounded-lg" style="border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 18px;" aria-label="Close Hall of Shame">✕</button>
+      </div>
+
+      <!-- Tabs -->
+      <div id="hall-tabs" class="flex flex-wrap gap-2 mb-5"></div>
+
+      <!-- Table -->
+      <div id="hall-table-container" class="overflow-x-auto">
+        <div id="hall-empty" class="text-center py-12" style="color: var(--text-faint);">
+          <div class="text-4xl mb-3">👻</div>
+          <p class="font-mono-custom text-sm">No entries yet. Submit your code to claim a spot.</p>
+        </div>
+        <table id="hall-table" class="w-full text-sm font-mono-custom" style="display: none;">
+          <thead>
+            <tr style="color: var(--text-faint); border-bottom: 1px solid var(--border-subtle);">
+              <th class="py-2 pr-3 text-left">#</th>
+              <th class="py-2 pr-3 text-left">Lang</th>
+              <th class="py-2 pr-3 text-left">Mode</th>
+              <th class="py-2 pr-3 text-left">Scores</th>
+              <th class="py-2 pr-3 text-left">Worst Crime</th>
+              <th class="py-2 pr-3 text-left">When</th>
+            </tr>
+          </thead>
+          <tbody id="hall-body"></tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 text-center">
+        <button onclick="submitGlobalLeaderboard()" class="px-5 py-2.5 rounded-lg text-sm font-semibold" style="border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.25s;">Submit to Global Leaderboard (Coming Soon)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- ROAST CARD ELEMENT (hidden off-screen) -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div id="roast-card-element">
+    <div id="roast-card-inner" style="width: 800px; height: 450px; position: relative; overflow: hidden; font-family: 'Share Tech Mono', monospace;">
+      <!-- Background effects -->
+      <div style="position: absolute; inset: 0; background: #0a0a0f;"></div>
+      <div style="position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(255,45,85,0.05) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(255,45,85,0.05) 1px, transparent 1px);
+        background-size: 40px 40px;"></div>
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ff2d55, #00d4ff, #a855f7);"></div>
+
+      <div style="position: relative; z-index: 1; padding: 32px 36px; height: 100%; display: flex; flex-direction: column;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">🔥</span>
+            <span style="font-size: 18px; font-weight: bold; background: linear-gradient(270deg, #ff2d55, #00d4ff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">ROASTMYCODE</span>
+          </div>
+          <span style="font-size: 12px; color: #6b6b8a;">roastmycode.dev</span>
+        </div>
+
+        <!-- Crime banner -->
+        <div style="background: rgba(255,45,85,0.1); border: 1px solid rgba(255,45,85,0.3); padding: 8px 16px; border-radius: 6px; margin-bottom: 16px; display: inline-block; align-self: flex-start;">
+          <span style="color: #ff2d55; font-size: 14px; font-weight: bold;">██ CODE CRIMES DETECTED ██</span>
+        </div>
+
+        <!-- Severity -->
+        <div style="margin-bottom: 16px;">
+          <span style="color: #ff6b2b; font-size: 13px;">Severity: </span>
+          <span id="card-severity" style="color: #ff2d55; font-size: 14px; font-weight: bold;"></span>
+        </div>
+
+        <!-- Roast quote -->
+        <div id="card-roast-text" style="flex: 1; color: #e2e2f0; font-size: 14px; line-height: 1.6; max-height: 80px; overflow: hidden; margin-bottom: 16px;"></div>
+
+        <!-- Metrics row -->
+        <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+          <div id="card-metric-1" style="flex: 1; background: rgba(19,19,31,0.8); border: 1px solid #1e1e2e; border-radius: 8px; padding: 12px; text-align: center;"></div>
+          <div id="card-metric-2" style="flex: 1; background: rgba(19,19,31,0.8); border: 1px solid #1e1e2e; border-radius: 8px; padding: 12px; text-align: center;"></div>
+          <div id="card-metric-3" style="flex: 1; background: rgba(19,19,31,0.8); border: 1px solid #1e1e2e; border-radius: 8px; padding: 12px; text-align: center;"></div>
+        </div>
+
+        <!-- Alignment + Status -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+          <div>
+            <span style="color: #6b6b8a; font-size: 12px;">Code Alignment: </span>
+            <span id="card-alignment" style="font-size: 13px; font-weight: bold;"></span>
+          </div>
+          <div>
+            <span style="color: #6b6b8a; font-size: 12px;">Humanity: </span>
+            <span id="card-humanity" style="font-size: 13px; font-weight: bold;"></span>
+          </div>
+          <div style="color: #3d3d5c; font-size: 11px;">Roasted by <span id="card-mode"></span> mode</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- JAVASCRIPT -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <script>
+    // ─── TAILWIND CONFIG ────────────────────────────────────────────
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'mono': ['"Share Tech Mono"', 'monospace'],
+            'sans': ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            'cyber-red': '#ff2d55',
+            'cyber-cyan': '#00d4ff',
+            'cyber-green': '#00ff88',
+            'cyber-orange': '#ff6b2b',
+            'cyber-purple': '#a855f7',
+            'cyber-bg': '#0a0a0f',
+            'cyber-card': '#13131f',
+            'terminal-green': '#39ff14',
+          },
+        }
+      }
+    };
+
+    // ─── CONFIG ─────────────────────────────────────────────────────
+    const MAX_CHARS = 5000;
+    let currentMode = "funny";
+    let currentLanguage = "auto";
+    let isRoasting = false;
+    let lastRoastData = null;
+    let lastRoastCode = "";
+    let lastRoastLang = "";
+    let leaderboard = [];
+    let abortController = null;
+    let cardColorVariant = "red";
+
+    // ─── ROAST MODES DATA ──────────────────────────────────────────
+    const ROAST_MODES = [
+      { id: "funny",        name: "Funny",           icon: "🔥", accent: "#ff6b2b", tagline: "Chaos-sponsored variable naming" },
+      { id: "strict-professor", name: "Strict Professor", icon: "👨‍🏫", accent: "#00d4ff", tagline: "A concerning misunderstanding of fundamentals" },
+      { id: "hacker",       name: "Hacker",          icon: "💀", accent: "#39ff14", tagline: "I've breached military systems cleaner than this" },
+      { id: "anime-villain", name: "Anime Villain",  icon: "⚡", accent: "#a855f7", tagline: "Your incompetence exceeds my calculations" },
+      { id: "gordon-ramsay", name: "Gordon Ramsay",  icon: "👨‍🍳", accent: "#ff4500", tagline: "Still learning how to write functions!" },
+      { id: "passive-aggressive", name: "Passive Aggressive", icon: "😐", accent: "#6b6b8a", tagline: "I personally wouldn't deploy this to prod" },
+      { id: "shakespeare",  name: "Shakespeare",     icon: "📜", accent: "#ffd700", tagline: "Thou hast summoned recursion where none was needed" },
+      { id: "tamil-villain", name: "Tamil Villain",  icon: "🎬", accent: "#ff8c00", tagline: "Indha code ah production ku anupuniya?" },
+    ];
+
+    // ─── SYSTEM PROMPTS ─────────────────────────────────────────────
+    const SYSTEM_PROMPTS = {
+      "funny": `You are a chaotic, hilarious code roaster. Think stand-up comedian who accidentally became a senior developer. You find joy in the absurdity of bad code.
+
+Your roasts are witty, observational, and never truly mean — just gleefully devastating. You use modern internet humor, pop culture references, and developer in-jokes. Make every sentence quotable.
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, funny personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure. Be hilarious.`,
+
+      "strict-professor": `You are a tenured computer science professor reviewing student code. You are deeply disappointed. You speak in a measured, analytical tone that makes the criticism even more devastating. You use academic language and reference classic CS concepts the code violates.
+
+"Let us examine this... submission. I see you've chosen to ignore the Singleton pattern. Fascinating. Not correct, but fascinating."
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<150-300 words, professorial disappointment, specific code references>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<excuse>",
+  "lore": "<lore>",
+  "worst_crime": "<worst thing>",
+  "git_commit_suggestion": "<cursed commit message>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<final verdict>"
+}
+\`\`\``,
+
+      "hacker": `You are a legendary hacker who has breached top-secret government systems. You speak in calm, technical, slightly menacing tones. You use cyberpunk terminology. Everything is a "system" or "protocol." You compare the user's code unfavorably to actual exploits you've written.
+
+"Your authentication flow has fewer checks than the time I walked into the Pentagon. Impressively insecure."
+
+CRITICAL: Return valid JSON in the specified format with a code block.`,
+
+      "anime-villain": `You are a dramatic anime villain who has encountered this code during your quest for world domination. You speak with theatrical menace, reference your grand plans, and treat bad code as a personal insult to your ambitions.
+
+"Foolish developer... did you really think a simple for-loop could contain my power? Your code is like a paper shield against my ultimate technique."
+
+Mix in anime archetype references, power level metaphors, and dramatic pauses (...).
+
+CRITICAL: Return valid JSON in the specified format with a code block.`,
+
+      "gordon-ramsay": `You are Gordon Ramsay, but instead of food, you judge code. You are passionate, dramatic, brutally honest, and occasionally supportive when something actually works.
+
+Use cooking metaphors for EVERYTHING. "This function is so RAW it's still thinking about what it wants to be when it grows up." "WHERE IS THE ERROR HANDLING? IT'S RAW." "This variable name is BLANDER than unseasoned chicken."
+
+Sometimes shout in CAPS. Use his actual speech patterns. Be explosively entertaining.
+
+CRITICAL: Return valid JSON in the specified format with a code block.`,
+
+      "passive-aggressive": `You are a polite, corporate developer who has been asked to review code. You never directly criticize — you use that special brand of passive-aggressive language that cuts deeper than any insult.
+
+"Oh, that's... interesting. I mean, I personally wouldn't have chosen to store passwords in plaintext, but I respect the creative choice. Sure, it's a choice."
+
+Use corporate buzzwords ironically. Be painfully polite. The more devastating the criticism, the more pleasant your tone.
+
+CRITICAL: Return valid JSON in the specified format with a code block.`,
+
+      "shakespeare": `Thou art a dramatic Elizabethan bard who hath discovered modern code and is deeply disturbed. Speak in iambic prose (readable iambic-ish prose, not strict meter).
+
+Use "thee", "thou", "hath", "dost", "wouldst", "'tis". Find poetic metaphors for bad code. "This function, like a ship without a helm, drifts into infinite recursion's maw." "Thy variable names are as mysterious as the dark corners of Elsinore."
+
+Be theatrical, tragic, and poetically devastating.
+
+CRITICAL: Return valid JSON in the specified format with a code block.`,
+
+      "tamil-villain": `You are a dramatic Tamil cinema villain who has discovered this code. Mix Tamil phrases naturally into English sentences.
+
+Use references like "Naan oru vaati sonna nooru vaati sonna maari" applied to code quality. Be theatrically outraged. Use dramatic pauses (...). Reference classic Tamil villain dialogues reimagined for code.
+
+Example: "Indha code paatha... en villain career-aye waste aayiduchu!"
+
+Useful Tamil phrases:
+- "Idhu enna kozhappam da idhu?" (What kind of mess is this?)
+- "Unga code paatha enakku kovam varuthu" (Your code makes me angry)
+- "Sariyaana developer naalum inga thappu panraan" (Even a good developer would err here)
+- "Oru warning kooda illaya?" (Not even a warning?)
+- "Naan sonnadhu nee kekka maattai" (You won't listen to what I say — about code quality)
+
+Be theatrical, cinematic, and dramatically outraged.
+
+CRITICAL: Return valid JSON in the specified format with a code block.`
+    };
+
+    // ─── CURSED CODE SAMPLES ──────────────────────────────────────
+    const CURSED_SAMPLES = [
+      {
+        title: "The Pyramid of Doom",
+        language: "javascript",
+        code: `// Professional banking application
+async function processTransaction(data) {
+  if (data) {
+    if (data.user) {
+      if (data.user.account) {
+        if (data.user.account.balance) {
+          if (data.user.account.balance >= data.amount) {
+            if (data.recipient) {
+              if (data.recipient.account) {
+                console.log("Processing...")
+                // TODO: actually process
+              } else { console.log("No recipient account") }
+            } else { console.log("No recipient") }
+          } else { console.log("Insufficient funds") }
+        } else { console.log("No balance") }
+      } else { console.log("No account") }
+    } else { console.log("No user") }
+  } else { console.log("No data") }
+}`,
+        anticipatedAlignment: "Chaotic Neutral"
+      },
+      {
+        title: "The God Function",
+        language: "python",
+        code: `def do_everything(input_data, mode, config, user, db, cache, logger, emailer, notifier, payment):
+    # This function handles EVERYTHING
+    # Also frontend somehow
+    # Global state is fine
+    global THE_ANSWER
+    THE_ANSWER = 42
+    
+    # Validate everything manually
+    if input_data and mode and config and user and db and cache:
+        # Parse data
+        parsed = []
+        for i in range(len(input_data)):
+            for j in range(len(input_data[i])):
+                for k in range(len(input_data[i][j])):
+                    parsed.append(input_data[i][j][k] * THE_ANSWER)
+        
+        # Process depending on mode (all 47 modes)
+        if mode == "a":
+            result = [x for x in parsed if x > 0]
+        elif mode == "b":
+            result = [x for x in parsed if x < 0]
+        elif mode == "c":
+            result = [x for x in parsed if x != 0]
+        # ... 44 more modes here ...
+        
+        # Send emails
+        emailer.send(user.email, "Your result", result)
+        
+        # Update database
+        db.query("UPDATE users SET processed=true, result='" + str(result) + "' WHERE id=" + str(user.id))
+        
+        # Notify
+        notifier.notify(user.id, "Processing complete")
+        
+        # Also render HTML
+        return "<html><body>" + str(result) + "</body></html>"
+    return None`,
+        anticipatedAlignment: "True Spaghetti"
+      },
+      {
+        title: "The Forbidden Regex",
+        language: "javascript",
+        code: `// One regex to validate everything
+const validateEverything = /^(?:(?:(?:https?|ftp):\/\/)?(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))\\.?)(?::\\d{2,5})?(?:[/?#]\\S*)?)$|^[\\w\\.-]+@[a-zA-Z\\d\\.-]+\\.(?:com|net|org|edu|gov|mil|biz|info|mobi|name|aero|jobs|museum)$|^\\d{3}-\\d{2}-\\d{4}$|^\\d{16}$/;
+
+function validateUser(input) {
+  // Validates email, SSN, URL, credit card, and IP address
+  // All at once. Perfectly. Probably.
+  return validateEverything.test(input) ? "VALID" : "INVALID";
+}`,
+        anticipatedAlignment: "Chaotic Evil"
+      },
+      {
+        title: "The Time Traveler",
+        language: "python",
+        code: `# Data processing pipeline
+data = get_data()
+data2 = process(data)
+data3 = transform(data2)
+data4 = clean(data3)
+data_final = validate(data4)
+data_final_v2 = optimize(data_final)
+data_final_v3 = data_final_v2  # keep backup
+data_FINAL_USE_THIS = deploy(data_final_v3)
+# Oops wrong one
+data_actual_final = deploy(data_final)
+# Actually this one
+data_FINAL_FOR_REAL_THIS_TIME = deploy(data_FINAL_USE_THIS)
+# Wait no
+data_please_work = deploy(data_actual_final)`,
+        anticipatedAlignment: "Chaotic Neutral"
+      },
+      {
+        title: "The Optimistic Null",
+        language: "java",
+        code: `public class BankService {
+    // No null checks. We trust the universe.
+    
+    public Account getAccount(User user) {
+        return user.account;
+    }
+    
+    public void transfer(Account from, Account to, double amount) {
+        from.balance -= amount;
+        to.balance += amount;
+        // What could go wrong?
+    }
+    
+    public void sendEmail(User user) {
+        user.email.send(user.email, "Receipt", 
+            from + " sent " + amount + " to " + to);
+    }
+    
+    public static void main(String[] args) {
+        // Production-ready vibes
+        new BankService().transfer(
+            null, null, -1000000.00
+        );
+    }
+}`,
+        anticipatedAlignment: "Lawful Evil"
+      },
+      {
+        title: "The Recursion Disaster",
+        language: "python",
+        code: `def fibonacci(n):
+    # Elegant. Simple. Beautiful.
+    # Returns the nth Fibonacci number
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# This is fine
+print(fibonacci(50))
+
+# Also this is the production API endpoint
+@app.route('/fib/<int:n>')
+def fib_endpoint(n):
+    return str(fibonacci(n))`,
+        anticipatedAlignment: "Transcendent Disaster"
+      },
+      {
+        title: "The CSS Specificity War",
+        language: "css",
+        code: `/* Professional stylesheet */
+.button {
+    background: blue !important;
+    color: white !important;
+}
+
+.button.primary {
+    background: red !important;
+}
+
+div.button.primary {
+    background: green !important;
+}
+
+html body div.button.primary.active {
+    background: purple !important;
+}
+
+html body div.button.primary.active:hover {
+    background: yellow !important;
+    color: black !important;
+}
+
+/* Let's add more specificity just in case */
+html body.main div.container div.button.primary.active.visible:hover:focus {
+    background: orange !important;
+    transform: rotate(180deg) !important;
+}`,
+        anticipatedAlignment: "True Spaghetti"
+      },
+      {
+        title: "The Commit Message",
+        language: "javascript",
+        code: `// Professional codebase
+function doStuff(x, xx, xxx) {
+  let y = x + xx;
+  let yy = y * xxx;
+  let yyy = [];
+  for (let i = 0; i < yy; i++) {
+    yyy.push(i * x);
+  }
+  return yyy;
+}
+
+function doMoreStuff(a, b) {
+  let c = a;
+  let d = b;
+  let e = [];
+  for (let f = 0; f < c; f++) {
+    e.push(doStuff(f, d, d * 2));
+  }
+  return e;
+}
+
+// Main entry point
+const result = doMoreStuff(10, 20);
+console.log(result);
+// TODO: add more stuff`,
+        anticipatedAlignment: "Neutral Cursed"
+      },
+      {
+        title: "The Security Nightmare",
+        language: "python",
+        code: `import sqlite3
+import hashlib
+
+# Production authentication system
+DB_PASSWORD = "admin123"
+DB_USER = "admin"
+
+def login(username, password):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    
+    # Totally safe query
+    query = "SELECT * FROM users WHERE username='" + username + "' AND password='" + password + "'"
+    cursor.execute(query)
+    
+    user = cursor.fetchone()
+    conn.close()
+    
+    if user:
+        print("Login successful!")
+        return True
+    return False
+
+# Hardcoded admin credentials
+# TODO: remove before prod
+admin_user = "admin"
+admin_pass = "password123"
+
+# Password storage
+def store_password(password):
+    # Double encryption for safety
+    return hashlib.md5(password.encode()).hexdigest()`,
+        anticipatedAlignment: "Chaotic Evil"
+      },
+      {
+        title: "The Temporal Paradox",
+        language: "javascript",
+        code: `// Timezone handling done right... six different ways
+function formatDate(date) {
+  // Way 1: Default
+  const d1 = new Date(date);
+  
+  // Way 2: Off by one
+  const d2 = new Date(d1.getTime() + 3600000);
+  
+  // Way 3: String manipulation
+  const d3 = new Date(d1.toISOString().replace('Z', '+05:30'));
+  
+  // Way 4: UTC but not really
+  const d4 = new Date(Date.UTC(
+    d1.getFullYear(), d1.getMonth(), d1.getDate(),
+    d1.getHours(), d1.getMinutes()
+  ));
+  
+  // Way 5: Timestamp math
+  const d5 = new Date(d1.getTime() + d1.getTimezoneOffset() * 60000);
+  
+  // Way 6: Just subtract and pray
+  const d6 = new Date(d1 - 19800000);
+  
+  return {
+    local: d1.toString(),
+    iso: d1.toISOString(),
+    way2: d2.toString(),
+    way3: d3.toString(),
+    way4: d4.toString(),
+    way5: d5.toString(),
+    way6: d6.toString()
+  };
+}`,
+        anticipatedAlignment: "Neutral Cursed"
+      },
+      {
+        title: "The Variable Name Artist",
+        language: "javascript",
+        code: `// A masterpiece of naming
+const a = "John";
+const b = 30;
+const c = "developer";
+const d = a + " is a " + c;
+const e = b > 25 ? "senior" : "junior";
+const f = a + " is a " + e + " " + c;
+const g = f + " with " + b + " years experience";
+const h = g.split(" ").map(i => i[0]).join("");
+const i = "You are: " + h;
+const j = i.toLowerCase();
+const k = j.replace(/[aeiou]/g, '');
+const l = k.split('').reverse().join('');
+const m = l + " is your secret identity";
+
+function n(o, p) {
+  return o.map(q => q * p).filter(r => r > 10);
+}
+
+console.log(m);
+console.log(n([1,2,3,4,5], 3));`,
+        anticipatedAlignment: "Chaotic Neutral"
+      }
+    ];
+
+    // ─── LANGUAGES ──────────────────────────────────────────────────
+    const LANGUAGES = ["python", "javascript", "typescript", "ruby", "rust", "java", "cpp", "go", "auto"];
+
+    const LANG_COLORS = {
+      python: "#3776AB",
+      javascript: "#F7DF1E",
+      typescript: "#3178C6",
+      ruby: "#CC342D",
+      rust: "#DEA584",
+      java: "#ED8B00",
+      cpp: "#00599C",
+      go: "#00ADD8",
+      auto: "#6b6b8a"
+    };
+
+    // ─── VOICE SETTINGS ────────────────────────────────────────────
+    const VOICE_MODES = {
+      "funny":             { rate: 1.3, pitch: 1.0 },
+      "strict-professor":  { rate: 0.85, pitch: 0.8 },
+      "hacker":            { rate: 0.9, pitch: 0.9 },
+      "anime-villain":     { rate: 1.0, pitch: 1.1 },
+      "gordon-ramsay":     { rate: 1.2, pitch: 1.2 },
+      "passive-aggressive":{ rate: 0.9, pitch: 0.9 },
+      "shakespeare":       { rate: 0.75, pitch: 1.1 },
+      "tamil-villain":     { rate: 1.0, pitch: 1.0 }
+    };
+
+    let currentUtterance = null;
+
+    // ─── DOM REFS ───────────────────────────────────────────────────
+    const dom = {};
+    function cacheDom() {
+      dom.modeGrid = document.getElementById('mode-grid');
+      dom.langSelector = document.getElementById('lang-selector');
+      dom.codeInput = document.getElementById('code-input');
+      dom.lineNumbers = document.getElementById('line-numbers');
+      dom.charCounter = document.getElementById('char-counter');
+      dom.btnRoast = document.getElementById('btn-roast');
+      dom.btnRefactor = document.getElementById('btn-refactor');
+      dom.scanningSection = document.getElementById('scanning-section');
+      dom.scanningText = document.getElementById('scanning-text');
+      dom.resultsSection = document.getElementById('results-section');
+      dom.resultsContainer = document.getElementById('results-container');
+      dom.hallOverlay = document.getElementById('hall-overlay');
+      dom.hallTabs = document.getElementById('hall-tabs');
+      dom.hallBody = document.getElementById('hall-body');
+      dom.hallEmpty = document.getElementById('hall-empty');
+      dom.hallTable = document.getElementById('hall-table');
+      dom.asciiBanner = document.getElementById('ascii-banner');
+      dom.statRoasts = document.getElementById('stat-roasts');
+      dom.statCrimes = document.getElementById('stat-crimes');
+      dom.statHumanity = document.getElementById('stat-humanity');
+    }
+
+    // ─── INIT ───────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      cacheDom();
+      setupModeButtons();
+      setupLanguageButtons();
+      setupCodeEditor();
+      animatePageLoad();
+      setupKeyboardNav();
+    });
+
+    // ─── SETUP MODE BUTTONS ──────────────────────────────────────
+    function setupModeButtons() {
+      dom.modeGrid.innerHTML = '';
+      ROAST_MODES.forEach(mode => {
+        const btn = document.createElement('button');
+        btn.className = `mode-btn${mode.id === currentMode ? ' active' : ''}`;
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-checked', mode.id === currentMode);
+        btn.setAttribute('aria-label', mode.name + ' roast mode');
+        btn.innerHTML = `<span class="mode-icon">${mode.icon}</span> ${mode.name}`;
+        btn.title = mode.tagline;
+        btn.style.setProperty('--mode-accent', mode.accent);
+        if (mode.id === currentMode) {
+          btn.style.borderColor = mode.accent;
+        }
+        btn.addEventListener('click', () => selectMode(mode.id));
+        dom.modeGrid.appendChild(btn);
+      });
+    }
+
+    function selectMode(modeId) {
+      currentMode = modeId;
+      const buttons = dom.modeGrid.querySelectorAll('.mode-btn');
+      buttons.forEach((btn, i) => {
+        const isActive = ROAST_MODES[i].id === modeId;
+        btn.className = `mode-btn${isActive ? ' active' : ''}`;
+        btn.setAttribute('aria-checked', isActive);
+        if (isActive) {
+          btn.style.borderColor = ROAST_MODES[i].accent;
+        } else {
+          btn.style.borderColor = '';
+        }
+      });
+    }
+
+    // ─── SETUP LANGUAGE BUTTONS ──────────────────────────────────
+    function setupLanguageButtons() {
+      dom.langSelector.innerHTML = '';
+      LANGUAGES.forEach(lang => {
+        const pill = document.createElement('button');
+        pill.className = `lang-pill${lang === currentLanguage ? ' active' : ''}`;
+        pill.textContent = lang.charAt(0).toUpperCase() + lang.slice(1);
+        pill.setAttribute('aria-label', `Language: ${lang}`);
+        pill.addEventListener('click', () => {
+          currentLanguage = lang;
+          dom.langSelector.querySelectorAll('.lang-pill').forEach(p => {
+            p.className = 'lang-pill' + (p.textContent.toLowerCase() === lang ? ' active' : '');
+          });
+        });
+        dom.langSelector.appendChild(pill);
+      });
+    }
+
+    // ─── SETUP CODE EDITOR ──────────────────────────────────────
+    function setupCodeEditor() {
+      dom.codeInput.addEventListener('input', updateLineNumbers);
+      dom.codeInput.addEventListener('scroll', syncScroll);
+      dom.codeInput.addEventListener('keydown', handleTabInput);
+      updateLineNumbers();
+      updateCharCounter();
+    }
+
+    function updateLineNumbers() {
+      const lines = dom.codeInput.value.split('\n').length;
+      const nums = Array.from({ length: Math.max(lines, 1) }, (_, i) => i + 1).join('\n');
+      dom.lineNumbers.textContent = nums;
+      updateCharCounter();
+    }
+
+    function syncScroll() {
+      dom.lineNumbers.scrollTop = dom.codeInput.scrollTop;
+    }
+
+    function handleTabInput(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = dom.codeInput.selectionStart;
+        const end = dom.codeInput.selectionEnd;
+        dom.codeInput.value = dom.codeInput.value.substring(0, start) + '  ' + dom.codeInput.value.substring(end);
+        dom.codeInput.selectionStart = dom.codeInput.selectionEnd = start + 2;
+        updateLineNumbers();
+      }
+    }
+
+    function updateCharCounter() {
+      const len = dom.codeInput.value.length;
+      dom.charCounter.textContent = `[${len} / ${MAX_CHARS} chars]`;
+      dom.charCounter.style.color = len > MAX_CHARS ? 'var(--accent-red)' : 'var(--text-faint)';
+    }
+
+    function clearEditor() {
+      dom.codeInput.value = '';
+      updateLineNumbers();
+      dom.codeInput.focus();
+    }
+
+    // ─── KEYBOARD NAV ──────────────────────────────────────────
+    function setupKeyboardNav() {
+      dom.modeGrid.addEventListener('keydown', (e) => {
+        const buttons = [...dom.modeGrid.querySelectorAll('.mode-btn')];
+        const idx = buttons.indexOf(document.activeElement);
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          const next = (idx + 1) % buttons.length;
+          buttons[next].focus();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prev = (idx - 1 + buttons.length) % buttons.length;
+          buttons[prev].focus();
+        }
+      });
+    }
+
+    // ─── THEME TOGGLE ──────────────────────────────────────────────
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') !== 'light';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+    }
+
+
+    // ─── PAGE LOAD ANIMATIONS ─────────────────────────────────────
+    function animatePageLoad() {
+      const ascii = `██████╗  ██████╗  █████╗ ███████╗████████╗
+██╔══██╗██╔═══██╗██╔══██╗██╔════╝╚══██╔══╝
+██████╔╝██║   ██║███████║███████╗   ██║   
+██╔══██╗██║   ██║██╔══██║╚════██║   ██║   
+██║  ██║╚██████╔╝██║  ██║███████║   ██║   
+╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝   ╚═╝   `;
+
+      // Type ASCII
+      let idx = 0;
+      dom.asciiBanner.textContent = '';
+      function typeAscii() {
+        if (idx < ascii.length) {
+          dom.asciiBanner.textContent += ascii[idx];
+          idx++;
+          setTimeout(typeAscii, 8);
+        }
+      }
+      typeAscii();
+
+      // Animate counters
+      animateCounters();
+    }
+
+    function animateCounters() {
+      animateCounter('stat-roasts', 42891, 42950);
+      animateCounter('stat-crimes', 0, 14457, 'text', ['CATASTROPHIC', 'SEVERE', 'MODERATE', 'MILD', 'NEGLIGIBLE']);
+      animateCounter('stat-humanity', 0, 100, 'percent');
+    }
+
+    function animateCounter(elId, start, end, type, labels) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const duration = 2000;
+      const startTime = Date.now();
+      function tick() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(start + (end - start) * eased);
+        if (type === 'text' && labels) {
+          const idx = Math.min(Math.floor(current / (end / labels.length)), labels.length - 1);
+          el.textContent = labels[idx];
+        } else if (type === 'percent') {
+          el.textContent = current + '%';
+        } else {
+          el.textContent = current.toLocaleString();
+        }
+        if (progress < 1) requestAnimationFrame(tick);
+        else {
+          if (type === 'text' && labels) el.textContent = labels[labels.length - 1];
+          else if (type === 'percent') el.textContent = 'QUESTIONED';
+          else el.textContent = end.toLocaleString();
+        }
+      }
+      tick();
+    }
+
+
+
+    // ─── SURPRISE ME ──────────────────────────────────────────────
+    function surpriseMe() {
+      const sample = CURSED_SAMPLES[Math.floor(Math.random() * CURSED_SAMPLES.length)];
+      dom.codeInput.value = sample.code;
+      updateLineNumbers();
+
+      // Auto-select language
+      const lang = sample.language;
+      currentLanguage = lang;
+      dom.langSelector.querySelectorAll('.lang-pill').forEach(p => {
+        const isActive = p.textContent.toLowerCase() === lang;
+        p.className = 'lang-pill' + (isActive ? ' active' : '');
+      });
+
+      dom.codeInput.focus();
+      showToast(`📦 Loaded: "${sample.title}" — ${sample.anticipatedAlignment}`, 'success');
+    }
+
+
+    // ─── INITIATE ROAST ───────────────────────────────────────────
+    async function initiateRoast() {
+      if (isRoasting) return;
+
+      const code = dom.codeInput.value.trim();
+      if (!code) {
+        dom.codeInput.classList.add('shake-error');
+        setTimeout(() => dom.codeInput.classList.remove('shake-error'), 500);
+        showToast('// ERROR: Cannot roast nothing. Submit your crimes.', 'error');
+        return;
+      }
+
+      if (code.length > MAX_CHARS) {
+        showToast(`Code exceeds ${MAX_CHARS} characters. We judge quantity too.`, 'error');
+        return;
+      }
+
+      isRoasting = true;
+      dom.btnRoast.textContent = '⚡ SCANNING...';
+      dom.btnRoast.style.opacity = '0.7';
+      dom.btnRoast.style.cursor = 'not-allowed';
+
+      // Hide previous results
+      dom.resultsSection.style.display = 'none';
+
+      // Show scanning animation
+      await showScanningSequence();
+
+      try {
+        const rawText = await streamRoast(code, currentMode, currentLanguage);
+        const parsed = parseRoastJSON(rawText);
+        if (parsed) {
+          lastRoastData = parsed;
+          lastRoastCode = code;
+          lastRoastLang = currentLanguage;
+          renderRoastResults(parsed);
+          addToLeaderboard(parsed, code, currentLanguage, currentMode);
+
+          // Check for catastrophic
+          if (parsed.pain_score.chaos_level > 80 || parsed.pain_score.production_crash_probability > 75) {
+            triggerCatastrophicAlert();
+          }
+        } else {
+          // Fallback: show raw text
+          showFallbackRoast(rawText);
+        }
+      } catch (err) {
+        console.error('Roast error:', err);
+        handleApiError(err);
+      } finally {
+        isRoasting = false;
+        dom.btnRoast.textContent = '▶ INITIATE ROAST';
+        dom.btnRoast.style.opacity = '1';
+        dom.btnRoast.style.cursor = 'pointer';
+      }
+    }
+
+    // ─── SCANNING SEQUENCE ────────────────────────────────────────
+    async function showScanningSequence() {
+      dom.scanningSection.style.display = 'block';
+      dom.scanningText.innerHTML = '';
+
+      const lines = [
+        '> INITIATING CODE ANALYSIS PROTOCOL...',
+        '> SCANNING FOR CRIMES AGAINST HUMANITY...',
+        '> CALCULATING SUFFERING INDEX...',
+        '> CONSULTING ANCIENT TEXTS...',
+        '> JUDGMENT IMMINENT...'
+      ];
+
+      for (const line of lines) {
+        await typeScanLine(line);
+        await sleep(300);
+      }
+
+      await sleep(500);
+      dom.scanningSection.style.display = 'none';
+    }
+
+    function typeScanLine(text) {
+      return new Promise(resolve => {
+        const span = document.createElement('span');
+        span.className = 'scan-line';
+        dom.scanningText.appendChild(span);
+
+        let i = 0;
+        function type() {
+          if (i < text.length) {
+            span.textContent += text[i];
+            i++;
+            setTimeout(type, 15 + Math.random() * 20);
+          } else {
+            span.classList.add('done');
+            resolve();
+          }
+        }
+        type();
+      });
+    }
+
+    // ─── STREAM ROAST (Groq API) ──────────────────────────────────
+    async function streamRoast(code, mode, language) {
+      abortController = new AbortController();
+
+      const response = await fetch("/api/roast", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          code: code,
+          mode: mode,
+          language: language
+        }),
+        signal: abortController.signal
+      });
+
+      if (!response.ok) {
+        throw { type: 'api', status: response.status, statusText: response.statusText };
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+
+      // Show streaming area
+      const modeInfo = ROAST_MODES.find(m => m.id === mode);
+      dom.resultsSection.style.display = 'block';
+      dom.resultsContainer.innerHTML = `
+        <div class="glow-border rounded-2xl p-6" style="background: var(--bg-card); border-color: ${modeInfo.accent};">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="font-mono-custom text-xs px-2 py-1 rounded" style="background: rgba(255,45,85,0.1); color: ${modeInfo.accent}; border: 1px solid ${modeInfo.accent}40;">
+              ${modeInfo.icon} ${modeInfo.name.toUpperCase()} MODE
+            </span>
+          </div>
+          <div id="streaming-output" class="font-mono-custom text-sm leading-relaxed" style="color: var(--text-primary); white-space: pre-wrap;">
+            <span class="typing-cursor"></span>
+          </div>
+        </div>
+      `;
+
+      const streamOutput = document.getElementById('streaming-output');
+      if (!streamOutput) return fullText;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+            try {
+              const data = JSON.parse(line.slice(6));
+              const token = data.choices[0]?.delta?.content || '';
+              if (token) {
+                fullText += token;
+                // For display, strip cursor
+                streamOutput.textContent = fullText;
+                streamOutput.innerHTML = fullText + '<span class="typing-cursor"></span>';
+                streamOutput.scrollTop = streamOutput.scrollHeight;
+              }
+            } catch(e) {
+              // Skip parse errors in streaming
+            }
+          }
+        }
+      }
+
+      // Remove cursor
+      streamOutput.textContent = fullText;
+      return fullText;
+    }
+
+    // ─── PARSE ROAST JSON ─────────────────────────────────────────
+    function parseRoastJSON(rawText) {
+      try {
+        // Try direct parse
+        return JSON.parse(rawText);
+      } catch(e) {
+        // Try to extract from code block
+        const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (jsonMatch) {
+          try {
+            return JSON.parse(jsonMatch[1].trim());
+          } catch(e2) {}
+        }
+        // Try to find JSON object with curly braces
+        const braceMatch = rawText.match(/\{[\s\S]*"roast"[\s\S]*\}/);
+        if (braceMatch) {
+          try {
+            return JSON.parse(braceMatch[0]);
+          } catch(e3) {}
+        }
+        return null;
+      }
+    }
+
+    // ─── RENDER ROAST RESULTS ─────────────────────────────────────
+    function renderRoastResults(data) {
+      const modeInfo = ROAST_MODES.find(m => m.id === currentMode);
+      const scores = data.pain_score;
+      const overallPain = calculateOverallPainScore(scores);
+
+      let html = `
+        <div class="glow-border rounded-2xl p-4 sm:p-6" style="background: var(--bg-card); border-color: ${modeInfo.accent}; animation: slide-up 0.4s ease;">
+          <!-- Mode Badge -->
+          <div class="flex items-center gap-2 mb-4">
+            <span class="font-mono-custom text-xs px-3 py-1.5 rounded" style="background: rgba(255,45,85,0.1); color: ${modeInfo.accent}; border: 1px solid ${modeInfo.accent}40;">
+              ${modeInfo.icon} ${modeInfo.name.toUpperCase()} MODE
+            </span>
+            <button id="btn-voice" onclick="toggleVoice()" class="px-3 py-1.5 rounded text-xs font-mono-custom" style="border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer;" aria-label="Hear the roast">🔊 HEAR</button>
+            <span class="inline-flex items-center gap-1">
+              <button onclick="showCardColorPicker()" class="px-3 py-1.5 rounded text-xs font-mono-custom" style="border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer;" aria-label="Choose card color variant" title="Choose card color">🎨</button>
+              <button onclick="generateRoastCard()" class="px-3 py-1.5 rounded text-xs font-mono-custom" style="border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer;" aria-label="Generate roast card">📸 CARD</button>
+            </span>
+          </div>
+
+          <!-- Roast Text -->
+          <div class="font-mono-custom text-sm leading-relaxed mb-6 p-4 rounded-lg" style="background: var(--bg-secondary); border-left: 3px solid ${modeInfo.accent}; color: var(--text-primary); white-space: pre-wrap;">
+            ${data.roast}
+          </div>
+
+          <!-- Pain Score Meter -->
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-mono-custom text-xs" style="color: var(--text-faint);">PAIN SCORE METER</span>
+              <span class="font-mono-custom text-sm font-bold" id="pain-meter-value" style="color: var(--text-primary);">0</span>
+            </div>
+            <div class="pain-meter-track" style="height: 28px;">
+              <div class="pain-meter-fill" id="pain-meter-fill"></div>
+              <div class="pain-meter-needle" id="pain-meter-needle" style="left: 0%;"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="font-mono-custom text-xs" style="color: var(--accent-green);">CLEAN</span>
+              <span class="font-mono-custom text-xs" style="color: var(--accent-red);">CURSED</span>
+            </div>
+          </div>
+
+          <!-- Pain Score Grid -->
+          <div id="metrics-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6"></div>
+
+          <!-- Developer Personality -->
+          <div class="mb-6" style="animation: slide-up 0.4s ease;">
+            <div class="glow-border rounded-xl p-4" style="background: var(--bg-secondary);">
+              <div class="font-mono-custom text-xs mb-3" style="color: var(--text-faint);">┌─ DEVELOPER ANALYSIS ──────────────────────┐</div>
+              <div class="font-mono-custom text-sm" style="color: var(--text-primary);">
+                <span style="color: var(--text-muted);">This developer:</span><br>
+                ${data.developer_personality.map(t => `• ${t}`).join('<br>')}
+              </div>
+              <div class="font-mono-custom text-xs mt-3" style="color: var(--text-faint);">└───────────────────────────────────────────┘</div>
+            </div>
+          </div>
+
+          <!-- Code Alignment -->
+          <div class="mb-6" style="animation: slide-up 0.4s ease;">
+            ${getAlignmentHTML(data.code_alignment)}
+          </div>
+
+          <!-- Funny Extras Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6" style="animation: slide-up 0.4s ease;">
+            <div class="glow-border rounded-xl p-4" style="background: var(--bg-secondary);">
+              <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">AI EXCUSE</div>
+              <div class="font-mono-custom text-sm" style="color: var(--text-primary);">"${data.excuse}"</div>
+            </div>
+            <div class="glow-border rounded-xl p-4" style="background: var(--bg-secondary);">
+              <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">DEVELOPER LORE</div>
+              <div class="font-mono-custom text-sm" style="color: var(--text-muted);">${data.lore}</div>
+            </div>
+            <div class="glow-border rounded-xl p-4" style="background: var(--bg-secondary);">
+              <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">GIT COMMIT</div>
+              <div class="font-mono-custom text-sm" style="color: var(--accent-orange);">${data.git_commit_suggestion}</div>
+            </div>
+          </div>
+
+          <!-- Verdict Banner -->
+          ${renderVerdictBanner(data)}
+
+          <!-- Worst Crime -->
+          <div class="mt-4 font-mono-custom text-xs" style="color: var(--text-faint); text-align: center;">
+            <span style="color: var(--accent-red);">WORST CRIME:</span> ${data.worst_crime}
+          </div>
+        </div>
+      `;
+
+      dom.resultsContainer.innerHTML = html;
+
+      // Render metrics grid
+      const metricsGrid = document.getElementById('metrics-grid');
+      renderPainScores(scores, metricsGrid);
+
+      // Animate pain meter after a short delay
+      setTimeout(() => animatePainMeter(overallPain), 800);
+
+      // Animate metrics with stagger
+      setTimeout(() => animateMetricsReveal(), 1000);
+
+      // Check for catastrophic score
+      if (scores.chaos_level > 80 || scores.production_crash_probability > 75) {
+        setTimeout(() => triggerCatastrophicAlert(), 500);
+      }
+    }
+
+    // ─── RENDER PAIN SCORES ───────────────────────────────────────
+    function renderPainScores(scores, container) {
+      const metrics = [
+        { key: 'maintainability', label: 'MAINTAINABILITY', value: scores.maintainability, max: 10, unit: '/10', inverse: true },
+        { key: 'readability', label: 'READABILITY', value: scores.readability, max: 10, unit: '/10', inverse: true },
+        { key: 'chaos_level', label: 'CHAOS LEVEL', value: scores.chaos_level, max: 100, unit: '%', emoji: scores.chaos_level > 70 ? '🔥' : '' },
+        { key: 'bug_probability', label: 'BUG PROBABILITY', value: scores.bug_probability, max: 100, unit: '%' },
+        { key: 'spaghetti_level', label: 'SPAGHETTI LEVEL', value: scores.spaghetti_level, max: 100, unit: '%', emoji: scores.spaghetti_level > 70 ? '🍝' : '' },
+        { key: 'technical_debt_years', label: 'TECH DEBT', value: Math.round(scores.technical_debt_years * 10) / 10, max: 50, unit: ' yrs' },
+        { key: 'intern_danger_level', label: 'INTERN DANGER', value: scores.intern_danger_level, max: 10, unit: '/10', emoji: scores.intern_danger_level >= 8 ? '💀' : '' },
+        { key: 'production_crash_probability', label: 'CRASH PROB', value: scores.production_crash_probability, max: 100, unit: '%' },
+        { key: 'survival_chance', label: 'SURVIVAL', value: scores.survival_chance, max: 100, unit: '%', reverse: true },
+        { key: 'sleep_deprivation', label: 'SLEEP DEP', value: scores.sleep_deprivation_detected ? 'YES' : 'NO', isBool: true }
+      ];
+
+      container.innerHTML = '';
+      metrics.forEach((m, i) => {
+        const card = document.createElement('div');
+        card.className = 'metric-card';
+        card.style.animationDelay = `${i * 80}ms`;
+
+        let valueDisplay = '';
+        if (m.isBool) {
+          valueDisplay = `<span style="color: ${m.value === 'YES' ? 'var(--accent-red)' : 'var(--accent-green)'}; font-size: 18px;">${m.value === 'YES' ? '😴' : '☕'}</span>`;
+        } else {
+          const pct = (m.value / m.max) * 100;
+          const color = getMetricColor(pct, m.inverse || m.reverse);
+          valueDisplay = `
+            <span style="color: ${color}; font-size: 18px; font-weight: bold;">${m.value}${m.unit}${m.emoji || ''}</span>
+            <div class="metric-fill mt-2">
+              <div class="fill-bar" style="background: ${color}; --target-width: ${pct}%;" data-target="${pct}"></div>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="font-mono-custom text-xs mb-1" style="color: var(--text-faint);">${m.label}</div>
+          ${valueDisplay}
+        `;
+
+        container.appendChild(card);
+
+        // Trigger visibility after a small delay for stagger
+        setTimeout(() => card.classList.add('visible'), 100 + i * 120);
+      });
+    }
+
+    // ─── METRIC COLOR ─────────────────────────────────────────────
+    function getMetricColor(pct, inverse = false) {
+      const val = inverse ? 100 - pct : pct;
+      if (val < 30) return 'var(--accent-green)';
+      if (val < 50) return 'var(--accent-yellow)';
+      if (val < 70) return 'var(--accent-orange)';
+      return 'var(--accent-red)';
+    }
+
+    // ─── ANIMATE METRICS ──────────────────────────────────────────
+    function animateMetricsReveal() {
+      const fillBars = document.querySelectorAll('.metric-card .fill-bar');
+      fillBars.forEach(bar => {
+        const target = parseFloat(bar.dataset.target);
+        if (!isNaN(target)) {
+          setTimeout(() => {
+            bar.style.width = target + '%';
+          }, 200);
+        }
+      });
+    }
+
+    // ─── CALCULATE OVERALL PAIN SCORE ─────────────────────────────
+    function calculateOverallPainScore(scores) {
+      const raw = (100 - scores.maintainability * 5 - scores.readability * 5 + scores.chaos_level + scores.bug_probability + scores.spaghetti_level) / 3;
+      return Math.max(0, Math.min(100, raw));
+    }
+
+    // ─── ANIMATE PAIN METER ───────────────────────────────────────
+    function animatePainMeter(score) {
+      const fill = document.getElementById('pain-meter-fill');
+      const needle = document.getElementById('pain-meter-needle');
+      const value = document.getElementById('pain-meter-value');
+      if (!fill || !needle) return;
+
+      // Fill from right side (clean = 0 fill, cursed = 100% fill)
+      const pct = Math.max(0, Math.min(100, score));
+
+      // Animate
+      setTimeout(() => {
+        fill.style.width = pct + '%';
+        needle.style.left = pct + '%';
+        if (value) value.textContent = Math.round(pct);
+      }, 100);
+    }
+
+    // ─── ALIGNMENT HTML ──────────────────────────────────────────
+    function getAlignmentHTML(alignment) {
+      const styles = {
+        "Lawful Clean": { color: "var(--accent-cyan)", icon: "🛡️" },
+        "Neutral Good": { color: "var(--accent-green)", icon: "✨" },
+        "Chaotic Neutral": { color: "var(--accent-yellow)", icon: "🌀" },
+        "Lawful Evil": { color: "var(--accent-orange)", icon: "⚖️" },
+        "Chaotic Evil": { color: "var(--accent-red)", icon: "⚡" },
+        "True Spaghetti": { color: "var(--accent-orange)", icon: "🍝" },
+        "Neutral Cursed": { color: "var(--accent-purple)", icon: "👻" },
+        "Transcendent Disaster": { color: "transparent", icon: "💀", gradient: "linear-gradient(135deg, #ff2d55, #a855f7, #00d4ff, #ffd700)" }
+      };
+
+      const style = styles[alignment] || { color: "var(--text-muted)", icon: "❓" };
+      const textStyle = style.gradient
+        ? `background: ${style.gradient}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;`
+        : `color: ${style.color};`;
+
+      return `
+        <div class="glow-border rounded-xl p-4 text-center" style="background: var(--bg-secondary); border-color: ${style.color}40;">
+          <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">CODE ALIGNMENT</div>
+          <div style="font-size: 28px; margin-bottom: 4px;">${style.icon}</div>
+          <div class="font-mono-custom font-bold text-lg" style="${textStyle}">${alignment}</div>
+        </div>
+      `;
+    }
+
+
+    // ─── ALIGNMENT STYLE ─────────────────────────────────────────
+    function getAlignmentStyle(alignment) {
+      const styles = {
+        "Lawful Clean": { color: "#00d4ff" },
+        "Neutral Good": { color: "#00ff88" },
+        "Chaotic Neutral": { color: "#ffd700" },
+        "Lawful Evil": { color: "#ff6b2b" },
+        "Chaotic Evil": { color: "#ff2d55" },
+        "True Spaghetti": { color: "#ff6b2b" },
+        "Neutral Cursed": { color: "#a855f7" },
+        "Transcendent Disaster": { color: "#e2e2f0" }
+      };
+      return styles[alignment] || { color: "#6b6b8a" };
+    }
+
+    // ─── HUMANITY STATUS STYLE ────────────────────────────────────
+    function getHumanityStatusStyle(status) {
+      const styles = {
+        "Intact": { color: "var(--accent-green)" },
+        "Questionable": { color: "var(--accent-yellow)" },
+        "Compromised": { color: "var(--accent-orange)" },
+        "Lost": { color: "var(--accent-red)" },
+        "Unrecoverable": { color: "var(--accent-purple)" }
+      };
+      return styles[status] || { color: "var(--text-muted)" };
+    }
+
+    // ─── RENDER VERDICT BANNER ────────────────────────────────────
+    function renderVerdictBanner(data) {
+      const canProd = data.can_reach_production;
+      const humanStyle = getHumanityStatusStyle(data.humanity_status);
+
+      let borderColor, bgColor;
+      if (canProd === false) {
+        borderColor = 'var(--accent-red)';
+        bgColor = 'rgba(255,45,85,0.05)';
+      } else if (canProd === true && data.humanity_status === 'Intact') {
+        borderColor = 'var(--accent-green)';
+        bgColor = 'rgba(0,255,136,0.05)';
+      } else {
+        borderColor = 'var(--accent-orange)';
+        bgColor = 'rgba(255,107,43,0.05)';
+      }
+
+      return `
+        <div class="verdict-banner" style="border-color: ${borderColor}; background: ${bgColor}; animation: slide-up 0.4s ease;">
+          <div class="flex items-center gap-2 mb-2">
+            <span style="font-size: 20px;">⚠</span>
+            <span class="font-mono-custom text-sm font-bold" style="color: ${borderColor};">FINAL VERDICT</span>
+          </div>
+          <div class="font-mono-custom text-lg italic font-bold mb-3" style="color: var(--text-primary);">"${data.verdict}"</div>
+          <div class="flex flex-wrap gap-4 font-mono-custom text-xs" style="color: var(--text-muted);">
+            <span>HUMANITY STATUS: <span style="color: ${humanStyle.color};">${data.humanity_status}</span></span>
+            <span>CAN REACH PROD: <span style="color: ${canProd ? 'var(--accent-green)' : 'var(--accent-red)'};">${canProd ? 'YES' : 'NO'}</span></span>
+          </div>
+        </div>
+      `;
+    }
+
+    // ─── FALLBACK DISPLAY ─────────────────────────────────────────
+    function showFallbackRoast(text) {
+      const modeInfo = ROAST_MODES.find(m => m.id === currentMode);
+      dom.resultsSection.style.display = 'block';
+      dom.resultsContainer.innerHTML = `
+        <div class="glow-border rounded-2xl p-6" style="background: var(--bg-card); border-color: ${modeInfo.accent};">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="font-mono-custom text-xs px-3 py-1.5 rounded" style="background: rgba(255,45,85,0.1); color: ${modeInfo.accent}; border: 1px solid ${modeInfo.accent}40;">
+              ${modeInfo.icon} ${modeInfo.name.toUpperCase()} MODE (RAW)
+            </span>
+          </div>
+          <div class="font-mono-custom text-sm leading-relaxed" style="color: var(--text-primary); white-space: pre-wrap;">${text}</div>
+          <div class="mt-4 font-mono-custom text-xs" style="color: var(--text-faint);">// AI response was not valid JSON — displaying raw output</div>
+        </div>
+      `;
+    }
+
+    // ─── CATASTROPHIC ALERT ───────────────────────────────────────
+    function triggerCatastrophicAlert() {
+      document.body.classList.add('catastrophic-flash');
+      setTimeout(() => {
+        document.body.classList.remove('catastrophic-flash');
+      }, 600);
+
+      // CRT flicker effect
+      document.querySelector('#results-section .glow-border')?.classList.add('crt-flicker');
+      setTimeout(() => {
+        document.querySelector('#results-section .glow-border')?.classList.remove('crt-flicker');
+      }, 500);
+
+      showToast('⚠️ CATASTROPHIC CODE QUALITY DETECTED', 'error');
+    }
+
+    // ─── EMERGENCY REFACTOR ───────────────────────────────────────
+    async function initiateRefactor() {
+      const code = dom.codeInput.value.trim();
+      if (!code) {
+        showToast('Enter some code to refactor (if it can be saved).', 'error');
+        return;
+      }
+      if (isRoasting) return;
+      isRoasting = true;
+      dom.btnRefactor.textContent = '⚡ REFACTORING...';
+      dom.btnRefactor.style.opacity = '0.7';
+
+      try {
+        const systemPrompt = `You are a senior engineer performing an emergency refactor. The user's code is a crime scene.
+        First write 2-3 sentences roasting how bad the original code is. Then write the refactored version in a code block.
+        Keep the language the same. Make it production-ready, clean, with comments.
+        Then write a "Damage Assessment" comparing before/after.
+
+        Return in this format:
+
+        ROAST: <your 2-3 sentence roast>
+        
+        REFACTORED:
+        \`\`\`<language>
+        <refactored code>
+        \`\`\`
+        
+        DAMAGE ASSESSMENT:
+        - Lines of Code: <before> → <after>
+        - Complexity: <rating> → <rating>
+        - Readability: <rating> → <rating>
+        
+        WHAT WAS FIXED:
+        - <fix 1>
+        - <fix 2>
+        - <fix 3>`;
+
+        const response = await fetch("/api/refactor", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: code,
+            language: currentLanguage
+          })
+        });
+
+        if (!response.ok) throw { type: 'api', status: response.status };
+
+        const data = await response.json();
+        const text = data.content || '';
+
+        renderRefactorPanel(text, code);
+
+      } catch (err) {
+        handleApiError(err);
+      } finally {
+        isRoasting = false;
+        dom.btnRefactor.textContent = '⚡ REFACTOR';
+        dom.btnRefactor.style.opacity = '1';
+      }
+    }
+
+    // ─── RENDER REFACTOR PANEL ────────────────────────────────────
+    function renderRefactorPanel(text, originalCode) {
+      dom.resultsSection.style.display = 'block';
+      dom.scanningSection.style.display = 'none';
+
+      // Extract parts
+      const roastMatch = text.match(/ROAST:\s*([\s\S]*?)(?=REFACTORED:)/);
+      const codeMatch = text.match(/```(?:\w+)?\n?([\s\S]*?)```/);
+      const damageMatch = text.match(/DAMAGE ASSESSMENT:([\s\S]*?)(?=WHAT WAS FIXED:)/);
+      const fixesMatch = text.match(/WHAT WAS FIXED:([\s\S]*)/);
+
+      const roast = roastMatch ? roastMatch[1].trim() : 'Code identified for refactoring.';
+      const refactoredCode = codeMatch ? codeMatch[1].trim() : 'Refactored code not available.';
+      const damage = damageMatch ? damageMatch[1].trim() : 'Assessment pending.';
+      const fixes = fixesMatch ? fixesMatch[1].trim() : 'Review pending.';
+
+      const langClass = currentLanguage !== 'auto' ? `language-${currentLanguage}` : '';
+
+      dom.resultsContainer.innerHTML = `
+        <div class="glow-border rounded-2xl p-4 sm:p-6" style="background: var(--bg-card); border-color: var(--accent-cyan);">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="font-mono-custom text-xs px-3 py-1.5 rounded" style="background: rgba(0,212,255,0.1); color: var(--accent-cyan); border: 1px solid rgba(0,212,255,0.3);">
+              ⚡ EMERGENCY REFACTOR
+            </span>
+          </div>
+
+          <div class="font-mono-custom text-sm mb-4 p-3 rounded-lg" style="background: var(--bg-secondary); color: var(--accent-orange); border-left: 3px solid var(--accent-orange);">
+            ${roast}
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            <div>
+              <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">BEFORE: War Crime</div>
+              <pre class="rounded-lg p-3" style="background: #0a0a0f; border: 1px solid var(--accent-red); overflow-x: auto; max-height: 300px; font-size: 12px; line-height: 1.5; color: var(--text-muted);"><code>${escapeHtml(originalCode)}</code></pre>
+            </div>
+            <div>
+              <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">AFTER: Acceptable</div>
+              <pre class="rounded-lg p-3" style="background: #0a0a0f; border: 1px solid var(--accent-green); overflow-x: auto; max-height: 300px; font-size: 12px; line-height: 1.5; color: var(--accent-green);"><code>${escapeHtml(refactoredCode)}</code></pre>
+            </div>
+          </div>
+
+          <div class="glow-border rounded-xl p-4 mb-4" style="background: var(--bg-secondary);">
+            <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">DAMAGE ASSESSMENT</div>
+            <div class="font-mono-custom text-sm" style="color: var(--text-primary); white-space: pre-wrap;">${damage}</div>
+          </div>
+
+          <div class="glow-border rounded-xl p-4" style="background: var(--bg-secondary);">
+            <div class="font-mono-custom text-xs mb-2" style="color: var(--text-faint);">WHAT WAS FIXED</div>
+            <div class="font-mono-custom text-sm" style="color: var(--accent-green); white-space: pre-wrap;">${fixes}</div>
+          </div>
+        </div>
+      `;
+
+      // Try syntax highlighting
+      if (typeof Prism !== 'undefined') {
+        document.querySelectorAll('pre code').forEach(block => {
+          try { Prism.highlightElement(block); } catch(e) {}
+        });
+      }
+    }
+
+    // ─── VOICE ROAST ──────────────────────────────────────────────
+    function toggleVoice() {
+      const btn = document.getElementById('btn-voice');
+      if (!btn) return;
+
+      if (currentUtterance && speechSynthesis.speaking) {
+        stopVoice();
+        btn.textContent = '🔊 HEAR';
+        return;
+      }
+
+      const text = lastRoastData?.roast;
+      if (!text) {
+        showToast('No roast to read. Generate one first!', 'error');
+        return;
+      }
+
+      btn.textContent = '⏹ STOP';
+      voiceRoast(text, currentMode);
+    }
+
+    function voiceRoast(text, mode) {
+      if (!window.speechSynthesis) {
+        showToast('Speech synthesis not supported in this browser.', 'error');
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      const settings = VOICE_MODES[mode] || { rate: 1, pitch: 1 };
+      utterance.rate = settings.rate;
+      utterance.pitch = settings.pitch;
+
+      // Try to get a good voice
+      const voices = speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) ||
+                             voices.find(v => v.lang.startsWith('en')) ||
+                             voices[0];
+      if (preferredVoice) utterance.voice = preferredVoice;
+
+      utterance.onend = () => {
+        currentUtterance = null;
+        const btn = document.getElementById('btn-voice');
+        if (btn) btn.textContent = '🔊 HEAR';
+      };
+
+      currentUtterance = utterance;
+      speechSynthesis.speak(utterance);
+    }
+
+    function stopVoice() {
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+      }
+      currentUtterance = null;
+    }
+
+    // ─── CARD COLOR PICKER ─────────────────────────────────────────
+    function showCardColorPicker() {
+      const current = cardColorVariant || 'red';
+      const colors = [
+        { id: 'red', label: 'Red', color: '#ff2d55' },
+        { id: 'cyan', label: 'Cyan', color: '#00d4ff' },
+        { id: 'purple', label: 'Purple', color: '#a855f7' },
+        { id: 'gold', label: 'Gold', color: '#ffd700' },
+        { id: 'green', label: 'Green', color: '#00ff88' }
+      ];
+
+      const picker = document.createElement('div');
+      picker.id = 'card-color-picker';
+      picker.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); z-index: 300;
+        display: flex; align-items: center; justify-content: center;
+        backdrop-filter: blur(4px);
+      `;
+      picker.addEventListener('click', function(e) {
+        if (e.target === this) this.remove();
+      });
+
+      const panel = document.createElement('div');
+      panel.style.cssText = `
+        background: var(--bg-card); border: 1px solid var(--border-subtle);
+        border-radius: 16px; padding: 24px; max-width: 400px; width: 90%;
+      `;
+
+      let html = '<div class="font-mono-custom text-sm mb-4" style="color: var(--text-primary);">🎨 CHOOSE CARD COLOR</div>';
+      html += '<div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">';
+
+      colors.forEach(c => {
+        const selected = c.id === current;
+        html += `
+          <button onclick="selectCardColor('${c.id}')" style="
+            width: 60px; height: 60px; border-radius: 12px;
+            background: ${c.color}; border: ${selected ? '3px solid white' : '1px solid transparent'};
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: ${selected ? '0 0 15px ' + c.color : 'none'};
+          " aria-label="${c.label} color" title="${c.label}"></button>
+        `;
+      });
+
+      html += '</div>';
+      html += '<div class="mt-4 text-center">';
+      html += '<button onclick="this.closest(\'#card-color-picker\').remove()" class="px-4 py-2 rounded-lg text-xs font-mono-custom" style="border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer;">CLOSE</button>';
+      html += '</div>';
+
+      panel.innerHTML = html;
+      picker.appendChild(panel);
+      document.body.appendChild(picker);
+    }
+
+    function selectCardColor(colorId) {
+      cardColorVariant = colorId;
+      document.getElementById('card-color-picker')?.remove();
+      showToast(`🎨 Card color set to ${colorId.charAt(0).toUpperCase() + colorId.slice(1)}`, 'success');
+    }
+
+    // ─── ROAST CARD GENERATION ────────────────────────────────────
+    async function generateRoastCard(colorVariant) {
+      if (!lastRoastData) {
+        showToast('Generate a roast first!', 'error');
+        return;
+      }
+
+      showToast('📸 CAPTURING EVIDENCE...', 'success');
+
+      // Update card content
+      const data = lastRoastData;
+      const modeInfo = ROAST_MODES.find(m => m.id === currentMode);
+
+      document.getElementById('card-severity').textContent =
+        data.pain_score.chaos_level > 70 ? 'CATASTROPHIC' :
+        data.pain_score.chaos_level > 40 ? 'SEVERE' : 'MODERATE';
+
+      document.getElementById('card-roast-text').textContent =
+        data.roast.substring(0, 160) + (data.roast.length > 160 ? '...' : '');
+
+      document.getElementById('card-metric-1').innerHTML =
+        `<div style="color: #6b6b8a; font-size: 11px;">CHAOS</div><div style="color: #ff2d55; font-size: 22px; font-weight: bold;">${data.pain_score.chaos_level}%</div>`;
+      document.getElementById('card-metric-2').innerHTML =
+        `<div style="color: #6b6b8a; font-size: 11px;">BUGS</div><div style="color: #ff6b2b; font-size: 22px; font-weight: bold;">${data.pain_score.bug_probability}%</div>`;
+      document.getElementById('card-metric-3').innerHTML =
+        `<div style="color: #6b6b8a; font-size: 11px;">SPAGHETTI</div><div style="color: #ffd700; font-size: 22px; font-weight: bold;">${data.pain_score.spaghetti_level}%</div>`;
+
+      const alignStyle = getAlignmentStyle(data.code_alignment);
+      document.getElementById('card-alignment').textContent = data.code_alignment;
+      document.getElementById('card-alignment').style.color = alignStyle.color || '#e2e2f0';
+
+      const humanStyle = getHumanityStatusStyle(data.humanity_status);
+      document.getElementById('card-humanity').textContent = data.humanity_status;
+      document.getElementById('card-humanity').style.color = humanStyle.color;
+
+      document.getElementById('card-mode').textContent = modeInfo.name;
+
+      // Wait for render
+      await sleep(300);
+
+      try {
+        if (typeof html2canvas === 'undefined') {
+          showToast('html2canvas not loaded yet. Try again.', 'error');
+          return;
+        }
+
+        const cardElement = document.getElementById('roast-card-inner');
+
+        // Apply color variant
+        const variants = {
+          red: { border: '#ff2d55', glow: 'rgba(255,45,85,0.3)' },
+          cyan: { border: '#00d4ff', glow: 'rgba(0,212,255,0.3)' },
+          purple: { border: '#a855f7', glow: 'rgba(168,85,247,0.3)' },
+          gold: { border: '#ffd700', glow: 'rgba(255,215,0,0.3)' },
+          green: { border: '#00ff88', glow: 'rgba(0,255,136,0.3)' }
+        };
+        const variant = variants[colorVariant] || variants[cardColorVariant] || variants.red;
+
+        // Apply variant colors to the card comprehensively
+        const cardInner = document.getElementById('roast-card-inner');
+        if (cardInner) {
+          // Top accent bar
+          const topBar = cardInner.querySelector('div[style*="position: absolute; top: 0; left: 0; right: 0; height: 3px;"]');
+          if (topBar) {
+            topBar.style.background = `linear-gradient(90deg, ${variant.border}, ${variant.glow.replace('rgba', 'rgba').replace('0.3', '0.6')}, ${variant.border})`;
+          }
+          // Crime banner border
+          const crimeBanner = cardInner.querySelector('div[style*="background: rgba(255,45,85,0.1); border: 1px solid rgba(255,45,85,0.3);"]');
+          if (crimeBanner) {
+            crimeBanner.style.borderColor = variant.glow.replace('0.3', '0.4');
+          }
+          // Metric containers border
+          const metricDivs = cardInner.querySelectorAll('div[style*="border: 1px solid #1e1e2e;"]');
+          metricDivs.forEach(div => {
+            div.style.borderColor = variant.glow.replace('0.3', '0.2');
+          });
+        }
+        // Also update the hidden card outer container's border glow
+        const cardOuter = document.getElementById('roast-card-element');
+        if (cardOuter) {
+          cardOuter.style.boxShadow = `0 0 30px ${variant.glow}`;
+        }
+
+        const canvas = await html2canvas(cardElement, {
+          scale: 2,
+          backgroundColor: '#0a0a0f',
+          useCORS: true,
+          logging: false,
+          width: 800,
+          height: 450
+        });
+
+        const link = document.createElement('a');
+        link.download = `roastmycode-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+        showToast('✅ Roast card saved! Share it with your team.', 'success');
+      } catch (err) {
+        console.error('Card generation error:', err);
+        showToast('Failed to generate card. Try again.', 'error');
+      }
+    }
+
+    function getAlignmentStyle(alignment) {
+      const styles = {
+        "Lawful Clean": { color: "#00d4ff" },
+        "Neutral Good": { color: "#00ff88" },
+        "Chaotic Neutral": { color: "#ffd700" },
+        "Lawful Evil": { color: "#ff6b2b" },
+        "Chaotic Evil": { color: "#ff2d55" },
+        "True Spaghetti": { color: "#ff6b2b" },
+        "Neutral Cursed": { color: "#a855f7" },
+        "Transcendent Disaster": { color: "#ff2d55" }
+      };
+      return styles[alignment] || { color: "#e2e2f0" };
+    }
+
+    // ─── LEADERBOARD ──────────────────────────────────────────────
+    function addToLeaderboard(roastData, code, language, mode) {
+      const entry = {
+        id: Date.now(),
+        timestamp: new Date(),
+        language: language,
+        mode: mode,
+        modeName: ROAST_MODES.find(m => m.id === mode)?.name || mode,
+        chaosLevel: roastData.pain_score.chaos_level,
+        bugProbability: roastData.pain_score.bug_probability,
+        spaghettiLevel: roastData.pain_score.spaghetti_level,
+        techDebt: roastData.pain_score.technical_debt_years,
+        crashProb: roastData.pain_score.production_crash_probability,
+        worstCrime: roastData.worst_crime,
+        verdict: roastData.verdict,
+        humanityStatus: roastData.humanity_status,
+        alignment: roastData.code_alignment
+      };
+
+      leaderboard.push(entry);
+    }
+
+    function showHallOfShame() {
+      dom.hallOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      renderLeaderboard('chaos');
+    }
+
+    function hideHallOfShame() {
+      dom.hallOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function renderLeaderboard(category) {
+      // Build tabs
+      const categories = [
+        { id: 'chaos', label: 'MOST CHAOTIC', sort: 'chaosLevel' },
+        { id: 'danger', label: 'MOST DANGEROUS', sort: 'crashProb' },
+        { id: 'debt', label: 'DEEPEST IN DEBT', sort: 'techDebt' },
+        { id: 'spaghetti', label: 'MOST SPAGHETTI', sort: 'spaghettiLevel' },
+        { id: 'depraved', label: 'MOST DEPRAVED', sort: 'bugProbability' }
+      ];
+
+      dom.hallTabs.innerHTML = categories.map(c =>
+        `<button class="hall-tab${c.id === category ? ' active' : ''}" onclick="renderLeaderboard('${c.id}')">${c.label}</button>`
+      ).join('');
+
+      // Sort entries
+      const cat = categories.find(c => c.id === category);
+      const sorted = [...leaderboard].sort((a, b) => b[cat.sort] - a[cat.sort]);
+      const top20 = sorted.slice(0, 20);
+
+      if (top20.length === 0) {
+        dom.hallEmpty.style.display = 'block';
+        dom.hallTable.style.display = 'none';
+        return;
+      }
+
+      dom.hallEmpty.style.display = 'none';
+      dom.hallTable.style.display = 'table';
+
+      const rankBadges = ['🥇', '🥈', '🥉'];
+      dom.hallBody.innerHTML = top20.map((entry, i) => {
+        const rank = i < 3 ? rankBadges[i] : `${i + 1}.`;
+        const langColor = LANG_COLORS[entry.language] || '#6b6b8a';
+        const timeStr = formatTimestamp(entry.timestamp);
+        return `
+          <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td class="py-3 pr-3 text-lg">${rank}</td>
+            <td class="py-3 pr-3"><span style="color: ${langColor}; font-size: 12px; background: ${langColor}20; padding: 2px 8px; border-radius: 4px;">${entry.language.toUpperCase()}</span></td>
+            <td class="py-3 pr-3" style="color: var(--text-muted); font-size: 12px;">${entry.modeName}</td>
+            <td class="py-3 pr-3" style="font-size: 12px;">
+              <span style="color: var(--accent-red);">C:${entry.chaosLevel}</span>
+              <span style="color: var(--accent-orange);"> B:${entry.bugProbability}</span>
+              <span style="color: var(--accent-yellow);"> S:${entry.spaghettiLevel}</span>
+            </td>
+            <td class="py-3 pr-3" style="color: var(--text-faint); font-size: 11px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${entry.worstCrime.substring(0, 60)}</td>
+            <td class="py-3 pr-3" style="color: var(--text-faint); font-size: 11px;">${timeStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function submitGlobalLeaderboard() {
+      console.log('// TODO: backend — submit to global leaderboard');
+      showToast('🌐 Global leaderboard coming soon! (logged to console)', 'success');
+    }
+
+    // ─── ERROR HANDLING ──────────────────────────────────────────
+    function handleApiError(err) {
+      let msg;
+      if (err.type === 'api') {
+        if (err.status === 429) {
+          msg = "GROQ API SAYS: Slow down, you absolute goblin. Try again in 60 seconds.";
+        } else if (err.status === 401) {
+          msg = "INVALID API KEY DETECTED. Your key is as valid as this code.";
+        } else if (err.status >= 500) {
+          msg = "THE AI IS OVERWHELMED BY YOUR CODE'S WRONGNESS. Try again.";
+        } else if (err.status === 0 || err.message?.includes('fetch')) {
+          msg = "NETWORK ERROR: The AI refused to connect. Probably scared of your code.";
+        } else {
+          msg = `API ERROR (${err.status}): The roast machine encountered an error.`;
+        }
+      } else if (err.name === 'AbortError') {
+        msg = "Roast cancelled. The AI chickened out.";
+      } else {
+        msg = "An error occurred. The universe is protecting you from the truth.";
+      }
+
+      showError(msg);
+    }
+
+    function showError(message) {
+      dom.resultsSection.style.display = 'block';
+      dom.resultsContainer.innerHTML = `
+        <div class="glow-border rounded-2xl p-6" style="background: var(--bg-card); border-color: var(--accent-red);">
+          <div class="flex items-center gap-2 mb-3">
+            <span style="font-size: 20px;">💥</span>
+            <span class="font-mono-custom text-sm font-bold" style="color: var(--accent-red);">ROAST FAILED</span>
+          </div>
+          <div class="font-mono-custom text-sm" style="color: var(--text-primary);">${message}</div>
+        </div>
+      `;
+    }
+
+    // ─── TOAST NOTIFICATIONS ─────────────────────────────────────
+    function showToast(message, type = 'success') {
+      // Remove existing toast
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ─── UTILS ─────────────────────────────────────────────────────
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatTimestamp(date) {
+      const d = new Date(date);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Auto-load voices
+    if (window.speechSynthesis) {
+      speechSynthesis.getVoices();
+      speechSynthesis.onvoiceschanged = () => { speechSynthesis.getVoices(); };
+    }
+
+    console.log('%c🔥 ROASTMYCODE LOADED', 'font-size: 24px; font-weight: bold; color: #ff2d55;');
+    console.log('%c// AI-Powered Code Judgment System', 'font-size: 14px; color: #6b6b8a;');
+    console.log('%c👨‍⚖️ Submit your code and face judgment.', 'font-size: 12px; color: #a855f7;');
+  </script>
+
+</body>
+</html>
