@@ -168,13 +168,13 @@ export default async function handler(req, res) {
         res.write(chunk);
       }
     } finally {
-      res.end();
+      if (!res.writableEnded) res.end();
     }
   } catch (err) {
     console.error('Roast proxy error:', err);
     if (!res.headersSent) {
       return res.status(500).json({ error: 'Internal server error' });
     }
-    res.end();
+    if (!res.writableEnded) res.end();
   }
 }
