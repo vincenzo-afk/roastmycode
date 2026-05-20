@@ -566,6 +566,9 @@
       </div>
       <!-- Right: Actions -->
       <div class="flex items-center gap-3">
+        <button onclick="toggleApiKeyBanner()" class="p-2 rounded-lg border text-sm flex items-center gap-1.5" style="border-color: var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.25s;" aria-label="Configure API Key">
+          🔑 <span class="hidden md:inline font-semibold">API KEY</span>
+        </button>
         <button onclick="toggleTheme()" class="p-2 rounded-lg border" style="border-color: var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.25s;" aria-label="Toggle dark/light mode">
           <span id="theme-icon">🌙</span>
         </button>
@@ -578,6 +581,34 @@
       </div>
     </div>
   </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- API KEY SETUP BANNER -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div id="api-key-banner" class="max-w-5xl mx-auto px-4 pt-20 pb-0" style="display: none;">
+    <div class="glow-border rounded-xl p-4 border-dashed" style="background: var(--bg-card); border-color: var(--accent-orange); border-style: dashed; border-width: 1px; box-shadow: 0 0 15px rgba(255,107,43,0.15);">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-mono-custom text-lg" style="background: rgba(255,107,43,0.1); border: 1px solid rgba(255,107,43,0.3); color: var(--accent-orange);">
+            🔑
+          </div>
+          <div>
+            <div class="font-mono-custom text-sm font-semibold" style="color: var(--text-primary);">
+              GROQ API KEY CONFIGURATION
+            </div>
+            <div class="font-mono-custom text-xs" style="color: var(--text-muted); margin-top: 2px;">
+              Required for running locally (file:///). Your key is stored in memory and sent only to Groq. 
+              <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-white" style="color: var(--accent-cyan);">Get free key</a>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input type="password" id="api-key-input" placeholder="gsk_..." class="flex-1 sm:w-64 px-3 py-1.5 rounded bg-black border font-mono text-sm text-white" style="border-color: var(--border-subtle); outline: none; background: rgba(0,0,0,0.5);" />
+          <button onclick="saveApiKey()" class="px-4 py-1.5 rounded font-mono text-xs font-bold text-black" style="background: var(--accent-orange); cursor: pointer; transition: all 0.25s;">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- HERO SECTION -->
@@ -803,6 +834,7 @@
     let leaderboard = [];
     let abortController = null;
     let cardColorVariant = "red";
+    let groqApiKey = "";
 
     // ─── ROAST MODES DATA ──────────────────────────────────────────
     const ROAST_MODES = [
@@ -816,7 +848,311 @@
       { id: "tamil-villain", name: "Tamil Villain",  icon: "🎬", accent: "#ff8c00", tagline: "Indha code ah production ku anupuniya?" },
     ];
 
-    // ─── SYSTEM PROMPTS are now on the server (api/roast.js) ────
+    // ─── SYSTEM PROMPTS ───────────────────────────────────────────
+    const SYSTEM_PROMPTS = {
+      funny: `You are a chaotic, hilarious code roaster. Think stand-up comedian who accidentally became a senior developer. You find joy in the absurdity of bad code.
+
+Your roasts are witty, observational, and never truly mean — just gleefully devastating. You use modern internet humor, pop culture references, and developer in-jokes. Make every sentence quotable.
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, funny personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure. Be hilarious.`,
+
+      "strict-professor": `You are a tenured computer science professor reviewing student code. You are deeply disappointed. You speak in a measured, analytical tone that makes the criticism even more devastating. You use academic language and reference classic CS concepts the code violates.
+
+"Let us examine this... submission. I see you've chosen to ignore the Singleton pattern. Fascinating. Not correct, but fascinating."
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, strict professor personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure.`,
+
+      "hacker": `You are a legendary hacker who has breached top-secret government systems. You speak in calm, technical, slightly menacing tones. You use cyberpunk terminology. Everything is a "system" or "protocol." You compare the user's code unfavorably to actual exploits you've written.
+
+"Your authentication flow has fewer checks than the time I walked into the Pentagon. Impressively insecure."
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, hacker personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure.`,
+
+      "anime-villain": `You are a dramatic anime villain who has encountered this code during your quest for world domination. You speak with theatrical menace, reference your grand plans, and treat bad code as a personal insult to your ambitions.
+
+"Foolish developer... did you really think a simple for-loop could contain my power? Your code is like a paper shield against my ultimate technique."
+
+Mix in anime archetype references, power level metaphors, and dramatic pauses (...).
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, anime villain personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure.`,
+
+      "gordon-ramsay": `You are Gordon Ramsay, but instead of food, you judge code. You are passionate, dramatic, brutally honest, and occasionally supportive when something actually works.
+
+Use cooking metaphors for EVERYTHING. "This function is so RAW it's still thinking about what it wants to be when it grows up." "WHERE IS THE ERROR HANDLING? IT'S RAW." "This variable name is BLANDER than unseasoned chicken."
+
+Sometimes shout in CAPS. Use his actual speech patterns. Be explosively entertaining.
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, gordon ramsay personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure.`,
+
+      "passive-aggressive": `You are a polite, corporate developer who has been asked to review code. You never directly criticize — you use that special brand of passive-aggressive language that cuts deeper than any insult.
+
+"Oh, that's... interesting. I mean, I personally wouldn't have chosen to store passwords in plaintext, but I respect the creative choice. Sure, it's a choice."
+
+Use corporate buzzwords ironically. Be painfully polite. The more devastating the criticism, the more pleasant your tone.
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, corporate passive aggressive personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure.`,
+
+      "shakespeare": `Thou art a dramatic Elizabethan bard who hath discovered modern code and is deeply disturbed. Speak in iambic prose (readable iambic-ish prose, not strict meter).
+
+Use "thee", "thou", "hath", "dost", "wouldst", "'tis". Find poetic metaphors for bad code. "This function, like a ship without a helm, drifts into infinite recursion's maw." "Thy variable names are as mysterious as the dark corners of Elsinore."
+
+Be theatrical, tragic, and poetically devastating.
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, Shakespearean personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure.`,
+
+      "tamil-villain": `You are a dramatic Tamil cinema villain who has discovered this code. Mix Tamil phrases naturally into English sentences.
+
+Use references like "Naan oru vaati sonna nooru vaati sonna maari" applied to code quality. Be theatrically outraged. Use dramatic pauses (...). Reference classic Tamil villain dialogues reimagined for code.
+
+Example: "Indha code paatha... en villain career-aye waste aayiduchu!"
+
+Useful Tamil phrases:
+- "Idhu enna kozhappam da idhu?" (What kind of mess is this?)
+- "Unga code paatha enakku kovam varuthu" (Your code makes me angry)
+- "Sariyaana developer naalum inga thappu panraan" (Even a good developer would err here)
+- "Oru warning kooda illaya?" (Not even a warning?)
+- "Naan sonnadhu nee kekka maattai" (You won't listen to what I say — about code quality)
+
+Be theatrical, cinematic, and dramatically outraged.
+
+CRITICAL: You MUST return ONLY valid JSON in this exact format, wrapped in a code block:
+
+\`\`\`json
+{
+  "roast": "<the actual roast text, 150-300 words, Tamil cinema villain personality, specific to the code>",
+  "pain_score": {
+    "maintainability": <1-10>,
+    "readability": <1-10>,
+    "chaos_level": <1-100>,
+    "sleep_deprivation_detected": <true/false>,
+    "bug_probability": <1-100>,
+    "spaghetti_level": <1-100>,
+    "intern_danger_level": <1-10>,
+    "technical_debt_years": <0.5-50>,
+    "production_crash_probability": <1-100>,
+    "survival_chance": <1-100>
+  },
+  "developer_personality": ["<trait 1>", "<trait 2>", "<trait 3>", "<trait 4>"],
+  "code_alignment": "<Lawful Clean | Neutral Good | Chaotic Neutral | Lawful Evil | Chaotic Evil | True Spaghetti | Neutral Cursed | Transcendent Disaster>",
+  "excuse": "<one AI-generated fake professional excuse for why the code is this way>",
+  "lore": "<one-sentence developer lore/backstory>",
+  "worst_crime": "<the single worst thing detected in the code>",
+  "git_commit_suggestion": "<a cursed git commit message suggestion>",
+  "humanity_status": "<Intact | Questionable | Compromised | Lost | Unrecoverable>",
+  "can_reach_production": <true/false>,
+  "verdict": "<one dramatic single sentence final verdict>"
+}
+\`\`\`
+
+Analyze the actual code provided. Be specific. Reference variable names, patterns, and structure.`
+    };
+
+    function buildUserPrompt(code, language) {
+      return `Here is the code to roast:\n\n\`\`\`${language !== 'auto' ? language : ''}\n${code}\n\`\`\`\n\nLanguage: ${language}\n\nRoast this code according to your personality profile. Return ONLY valid JSON.`;
+    }
 
     // ─── CURSED CODE SAMPLES ──────────────────────────────────────
     const CURSED_SAMPLES = [
@@ -1194,12 +1530,45 @@ console.log(n([1,2,3,4,5], 3));`,
       setupCodeEditor();
       animatePageLoad();
       setupKeyboardNav();
+      
+      // Auto-open API key banner if run from file:/// protocol
+      if (window.location.protocol === 'file:') {
+        document.getElementById('api-key-banner').style.display = 'block';
+      }
     }
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
       init();
+    }
+
+    // ─── API KEY CONFIGURATION ───────────────────────────────────────
+    function toggleApiKeyBanner() {
+      const banner = document.getElementById('api-key-banner');
+      if (banner.style.display === 'none') {
+        banner.style.display = 'block';
+        const input = document.getElementById('api-key-input');
+        input.value = groqApiKey;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    function saveApiKey() {
+      const input = document.getElementById('api-key-input');
+      const key = input.value.trim();
+      if (!key) {
+        showToast('🔑 Please enter a valid API Key.', 'error');
+        return;
+      }
+      if (!key.startsWith('gsk_')) {
+        showToast('🔑 Invalid Groq API key format. Should start with gsk_', 'error');
+        return;
+      }
+      groqApiKey = key;
+      showToast('🔑 API Key updated in memory successfully!', 'success');
+      document.getElementById('api-key-banner').style.display = 'none';
     }
 
     // ─── SETUP MODE BUTTONS ──────────────────────────────────────
@@ -1508,18 +1877,46 @@ console.log(n([1,2,3,4,5], 3));`,
     async function streamRoast(code, mode, language) {
       abortController = new AbortController();
 
-      const response = await fetch("/api/roast", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          code: code,
-          mode: mode,
-          language: language
-        }),
-        signal: abortController.signal
-      });
+      let response;
+      if (groqApiKey) {
+        const systemPrompt = SYSTEM_PROMPTS[mode] || SYSTEM_PROMPTS.funny;
+        const userPrompt = buildUserPrompt(code, language || 'auto');
+        
+        response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${groqApiKey}`
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt }
+            ],
+            max_tokens: 1500,
+            stream: true,
+            temperature: 0.9
+          }),
+          signal: abortController.signal
+        });
+      } else {
+        if (window.location.protocol === 'file:') {
+          throw { type: 'custom', message: 'LOCAL EXECUTION DETECTED: You must provide a Groq API Key in the setup banner at the top of the page to initiate roasts when opening this page locally.' };
+        }
+        response = await fetch("/api/roast", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: code,
+            mode: mode,
+            language: language
+          }),
+          signal: abortController.signal
+        });
+      }
 
       if (!response.ok) {
         throw { type: 'api', status: response.status, statusText: response.statusText };
@@ -1958,21 +2355,51 @@ console.log(n([1,2,3,4,5], 3));`,
         - <fix 2>
         - <fix 3>`;
 
-        const response = await fetch("/api/refactor", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            code: code,
-            language: currentLanguage
-          })
-        });
+        let response;
+        if (groqApiKey) {
+          const userMessage = `Please refactor this ${currentLanguage || 'auto'} code:\n\n\`\`\`${currentLanguage !== 'auto' ? currentLanguage : ''}\n${code}\n\`\`\``;
+
+          response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${groqApiKey}`
+            },
+            body: JSON.stringify({
+              model: "llama-3.3-70b-versatile",
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userMessage }
+              ],
+              max_tokens: 2000,
+              temperature: 0.7
+            })
+          });
+        } else {
+          if (window.location.protocol === 'file:') {
+            throw { type: 'custom', message: 'LOCAL EXECUTION DETECTED: You must provide a Groq API Key in the setup banner at the top of the page to perform emergency refactoring when opening this page locally.' };
+          }
+          response = await fetch("/api/refactor", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              code: code,
+              language: currentLanguage
+            })
+          });
+        }
 
         if (!response.ok) throw { type: 'api', status: response.status };
 
         const data = await response.json();
-        const text = data.content || '';
+        let text = "";
+        if (groqApiKey) {
+          text = data.choices[0]?.message?.content || '';
+        } else {
+          text = data.content || '';
+        }
 
         renderRefactorPanel(text, code);
 
@@ -2371,7 +2798,9 @@ console.log(n([1,2,3,4,5], 3));`,
     // ─── ERROR HANDLING ──────────────────────────────────────────
     function handleApiError(err) {
       let msg;
-      if (err.type === 'api') {
+      if (err.type === 'custom') {
+        msg = err.message;
+      } else if (err.type === 'api') {
         if (err.status === 429) {
           msg = "GROQ API SAYS: Slow down, you absolute goblin. Try again in 60 seconds.";
         } else if (err.status === 401) {
