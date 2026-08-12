@@ -1,10 +1,53 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+  <!-- Style direction: Terminal Tribunal — neo-brutalist cyber-noir, ember heat for risk, cyan/green for system state, and monospace evidence labels. -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ROASTMYCODE — AI-Powered Code Judgment System</title>
-  <meta name="description" content="Submit your code for brutal AI-powered roasting. Multiple personalities, pain scores, and shareable roast cards.">
+  <title>ROASTMYCODE — AI Code Roasting &amp; Refactoring Tool</title>
+  <meta name="description" content="ROASTMYCODE is an AI-powered code roasting and refactoring tool. Submit JavaScript, Python, TypeScript, Ruby, Rust, Java, C++, or Go and receive a memorable technical verdict.">
+  <meta name="keywords" content="AI code review, code roast, code roasting tool, developer humor, refactor code, JavaScript code review, Python code review, GitHub code tools">
+  <meta name="author" content="vincenzo-afk">
+  <meta name="application-name" content="ROASTMYCODE">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://roastmycode-lemon.vercel.app/">
+  <link rel="icon" type="image/png" href="/assets/roastmycode-logo.png">
+  <link rel="apple-touch-icon" href="/assets/roastmycode-logo.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ROASTMYCODE">
+  <meta property="og:title" content="ROASTMYCODE — AI Code Roasting &amp; Refactoring Tool">
+  <meta property="og:description" content="Submit your code. Face judgment. Get a specific, shareable technical verdict.">
+  <meta property="og:url" content="https://roastmycode-lemon.vercel.app/">
+  <meta property="og:image" content="https://roastmycode-lemon.vercel.app/assets/roastmycode-logo.png">
+  <meta property="og:image:alt" content="ROASTMYCODE circular code-and-flames emblem">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ROASTMYCODE — AI Code Roasting &amp; Refactoring Tool">
+  <meta name="twitter:description" content="Submit your code. Face judgment. Get a specific, shareable technical verdict.">
+  <meta name="twitter:image" content="https://roastmycode-lemon.vercel.app/assets/roastmycode-logo.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ROASTMYCODE",
+    "url": "https://roastmycode-lemon.vercel.app/",
+    "description": "AI-powered code roasting and refactoring tool with multiple personalities, pain scores, and shareable roast cards.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires a modern JavaScript-enabled browser",
+    "author": {
+      "@type": "Person",
+      "name": "vincenzo-afk",
+      "url": "https://github.com/vincenzo-afk"
+    },
+    "image": "https://roastmycode-lemon.vercel.app/assets/roastmycode-logo.png",
+    "codeRepository": "https://github.com/vincenzo-afk/roastmycode"
+  }
+  </script>
 
   <!-- Tailwind CSS v3 -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -135,6 +178,49 @@
 
     /* ─── CUSTOM CLASSES ──────────────────────────────────────────── */
     .font-mono-custom { font-family: 'Share Tech Mono', monospace; }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      display: block;
+      object-fit: cover;
+      border-radius: 10px;
+      background: #050505;
+      border: 1px solid rgba(255,107,43,0.55);
+      box-shadow: 0 0 18px rgba(255,59,48,0.2);
+    }
+
+    .repo-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255,107,43,0.65);
+      color: #ffd7c2;
+      background: rgba(255,107,43,0.08);
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .repo-cta:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent-orange);
+      background: rgba(255,107,43,0.16);
+      box-shadow: 0 0 18px rgba(255,107,43,0.18);
+    }
+    .repo-cta:active { transform: scale(0.97); }
+
+    .footer-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .footer-link:hover { color: var(--accent-orange); }
+
+    @media (max-width: 640px) {
+      .brand-logo { width: 34px; height: 34px; }
+      .brand-tagline { display: none !important; }
+      .nav-repo-label { display: none; }
+    }
 
     .glow-border {
       border: 1px solid var(--border-subtle);
@@ -550,24 +636,19 @@
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <nav class="fixed top-0 left-0 right-0 z-50" style="background: color-mix(in srgb, var(--bg-primary) 80%, transparent); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,45,85,0.2); box-shadow: 0 0 20px rgba(255,45,85,0.05);">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <!-- Left: Logo -->
-      <div class="flex items-center gap-2">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <text x="4" y="15" fill="#ff2d55" font-size="11" font-family="monospace" font-weight="bold">{</text>
-          <text x="11" y="15" fill="#ff2d55" font-size="11" font-family="monospace" font-weight="bold">}</text>
-          <rect x="9" y="8" width="4" height="6" rx="1" fill="#ff2d55" opacity="0.8"/>
-          <rect x="10" y="6" width="2" height="4" rx="1" fill="#ff6b2b" opacity="0.6"/>
-          <rect x="10" y="14" width="2" height="4" rx="1" fill="#ff6b2b" opacity="0.4"/>
-        </svg>
+      <!-- Left: supplied brand emblem -->
+      <a href="/" class="flex items-center gap-2" style="text-decoration: none;" aria-label="ROASTMYCODE home">
+        <img class="brand-logo" src="/assets/roastmycode-logo.png" alt="ROASTMYCODE circular code-and-flames emblem">
         <div>
           <span class="gradient-text text-xl font-bold tracking-tight" style="-webkit-text-fill-color: transparent;">ROASTMYCODE</span>
-          <span class="text-xs text-muted hidden sm:inline ml-2" style="color: var(--text-faint); font-family: 'Share Tech Mono', monospace;">// AI-Powered Code Judgment System</span>
+          <span class="brand-tagline text-xs text-muted hidden sm:inline ml-2" style="color: var(--text-faint); font-family: 'Share Tech Mono', monospace;">// AI-Powered Code Judgment System</span>
         </div>
-      </div>
+      </a>
       <!-- Right: Actions -->
-      <div class="flex items-center gap-3">        <a href="https://github.com/vincenzo-afk/roastmycode" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm" style="border: 1px solid var(--border-subtle); color: var(--text-muted); text-decoration: none; transition: all 0.25s;" aria-label="GitHub Repo">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="https://github.com/vincenzo-afk/roastmycode" target="_blank" rel="noopener noreferrer" class="repo-cta px-3 py-1.5 rounded-lg text-sm" aria-label="Open the ROASTMYCODE GitHub repository">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          <span class="font-semibold">Source</span>
+          <span class="nav-repo-label font-semibold">OPEN REPO</span>
         </a>
         <button onclick="toggleTheme()" class="p-2 rounded-lg border" style="border-color: var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.25s;" aria-label="Toggle dark/light mode">
           <span id="theme-icon">🌙</span>
@@ -648,6 +729,10 @@
         <button onclick="clearEditor()" class="py-3 px-4 rounded-xl flex items-center justify-center" style="background: transparent; border: 1px solid var(--border-subtle); color: var(--text-faint); cursor: pointer; transition: all 0.3s;" aria-label="Clear editor">
           📋
         </button>
+        <a href="https://github.com/vincenzo-afk/roastmycode" target="_blank" rel="noopener noreferrer" class="repo-cta py-3 px-4 rounded-xl text-sm font-semibold" aria-label="Open the ROASTMYCODE source repository">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          SOURCE
+        </a>
       </div>
     </div>
   </section>
@@ -709,6 +794,26 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BRANDED FOOTER -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <footer class="max-w-5xl mx-auto px-4 pt-4 pb-10" aria-label="ROASTMYCODE footer">
+    <div class="glow-border rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style="background: color-mix(in srgb, var(--bg-card) 88%, transparent);">
+      <div class="flex items-center gap-3">
+        <img class="brand-logo" src="/assets/roastmycode-logo.png" alt="ROASTMYCODE emblem" loading="lazy">
+        <div>
+          <div class="font-bold tracking-tight" style="color: var(--text-primary);">ROASTMYCODE</div>
+          <div class="font-mono-custom text-xs" style="color: var(--text-faint);">// evidence in, verdict out</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono-custom text-xs">
+        <a class="footer-link" href="https://github.com/vincenzo-afk/roastmycode" target="_blank" rel="noopener noreferrer">GitHub repository</a>
+        <a class="footer-link" href="https://github.com/vincenzo-afk/roastmycode/issues" target="_blank" rel="noopener noreferrer">Report an issue</a>
+        <span style="color: var(--text-faint);">© <span id="footer-year"></span> vincenzo-afk</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- ROAST CARD ELEMENT (hidden off-screen) -->
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <div id="roast-card-element">
@@ -728,7 +833,7 @@
             <span style="font-size: 24px;">🔥</span>
             <span style="font-size: 18px; font-weight: bold; background: linear-gradient(270deg, #ff2d55, #00d4ff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">ROASTMYCODE</span>
           </div>
-          <span style="font-size: 12px; color: #6b6b8a;">roastmycode.dev</span>
+          <span style="font-size: 12px; color: #6b6b8a;">roastmycode-lemon.vercel.app</span>
         </div>
 
         <!-- Crime banner -->
@@ -2755,6 +2860,9 @@ console.log(n([1,2,3,4,5], 3));`,
     }
 
     // Auto-load voices
+    const footerYear = document.getElementById('footer-year');
+    if (footerYear) footerYear.textContent = new Date().getFullYear();
+
     if (window.speechSynthesis) {
       speechSynthesis.getVoices();
       speechSynthesis.onvoiceschanged = () => { speechSynthesis.getVoices(); };
