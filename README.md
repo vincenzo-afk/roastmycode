@@ -1,34 +1,34 @@
 <div align="center">
 
-<img src="assets/roastmycode-logo.png" alt="ROASTMYCODE circular code-and-flames emblem" width="180">
+<img src="assets/roastmycode-logo.png" alt="ROASTMYCODE circular code-and-flames emblem" width="180" />
 
 # ROASTMYCODE
 
-**AI-powered code judgment for developers who prefer memorable feedback.**
+**An AI-powered code roaster and refactoring tool for developers who value memorable feedback.**
 
-[![Build](https://img.shields.io/badge/build-manual%20verification-ff6b2b?style=flat-square)](https://github.com/vincenzo-afk/roastmycode)
-[![Version](https://img.shields.io/badge/version-unreleased-00d4ff?style=flat-square)](https://github.com/vincenzo-afk/roastmycode/commits/main)
-[![License](https://img.shields.io/badge/license-not%20specified-6b6b8a?style=flat-square)](https://github.com/vincenzo-afk/roastmycode)
-[![Coverage](https://img.shields.io/badge/coverage-not%20configured-6b6b8a?style=flat-square)](https://github.com/vincenzo-afk/roastmycode)
-[![Dependencies](https://img.shields.io/badge/dependencies-CDN%20%2B%20Vercel-00ff88?style=flat-square)](https://github.com/vincenzo-afk/roastmycode)
+[![Validate project](https://github.com/vincenzo-afk/roastmycode/actions/workflows/validate.yml/badge.svg)](https://github.com/vincenzo-afk/roastmycode/actions/workflows/validate.yml)
 [![Stars](https://img.shields.io/github/stars/vincenzo-afk/roastmycode?style=flat-square)](https://github.com/vincenzo-afk/roastmycode/stargazers)
 [![Platform](https://img.shields.io/badge/platform-Vercel-000000?style=flat-square&logo=vercel)](https://vercel.com/)
+[![Dependencies](https://img.shields.io/badge/dependencies-CDN%20%2B%20serverless-00ff88?style=flat-square)](https://github.com/vincenzo-afk/roastmycode)
+[![License](https://img.shields.io/badge/license-not%20specified-6b6b8a?style=flat-square)](https://github.com/vincenzo-afk/roastmycode)
 
-[Live site](https://roastmycode-lemon.vercel.app/) · [Documentation](#documentation) · [Report a bug](https://github.com/vincenzo-afk/roastmycode/issues/new) · [Request a feature](https://github.com/vincenzo-afk/roastmycode/issues/new)
+[Live application](https://roastmycode-lemon.vercel.app/) · [Documentation](#documentation) · [Report a bug](https://github.com/vincenzo-afk/roastmycode/issues/new?template=bug_report.yml) · [Request a feature](https://github.com/vincenzo-afk/roastmycode/issues/new?template=feature_request.yml)
 
 </div>
 
-## Table of Contents
+---
 
-- [About the Project](#about-the-project)
-- [Features](#features)
+## <a id="table-of-contents"></a>Table of Contents
+
+- [About](#about)
+- [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
 - [API Reference](#api-reference)
 - [Project Structure](#project-structure)
-- [Roadmap and Limitations](#roadmap-and-limitations)
-- [Testing](#testing)
+- [Features and Limitations](#features-and-limitations)
+- [Testing and Continuous Integration](#testing-and-continuous-integration)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [Security](#security)
@@ -37,138 +37,145 @@
 
 ---
 
-## About the Project
+## <a id="about"></a>About
 
-ROASTMYCODE is a browser-based code roasting and refactoring tool. A developer pastes a code sample, chooses a roast personality and language, and receives a streaming technical verdict with pain scores, developer-personality observations, a code-alignment label, a worst-crime diagnosis, and a dramatic final verdict.
+ROASTMYCODE is a browser-based developer tool that turns a submitted code sample into a structured AI code roast. It is designed to make technical feedback specific and engaging: the result includes a personality-driven roast, code-quality metrics, a code-alignment label, a worst-crime diagnosis, a suggested commit message, and a final verdict. It also provides a separate emergency-refactor flow that returns cleaned-up code with a damage assessment.
 
-The project is intentionally more theatrical than a conventional linter. Its purpose is to make code feedback specific, memorable, and easy to share while still pointing at real patterns in the submitted code. The application also includes an emergency refactor flow that returns a cleaned-up version of the same code together with a damage assessment.
+The project does not replace static analysis, testing, security scanning, or human review. It adds an explanatory and shareable feedback layer to a code-review moment, using a server-side Groq proxy so the provider credential remains outside browser code.
 
-### What problem does it solve?
+### What is implemented
 
-Traditional static analysis is useful but often emotionally flat and difficult to share. ROASTMYCODE adds a human-readable narrative layer on top of an AI review so developers can quickly understand why a code sample is risky, confusing, or unusually chaotic. It is a playful companion to—not a replacement for—tests, linters, security scanners, and human review.
+- Eight roast modes: **Funny**, **Strict Professor**, **Hacker**, **Anime Villain**, **Gordon Ramsay**, **Passive Aggressive**, **Shakespeare**, and **Tamil Villain**.
+- Streaming roast delivery with ten pain-score fields and an expected structured result contract.
+- Emergency refactoring that returns a roast, revised code, damage assessment, and list of fixes.
+- JavaScript, TypeScript, Python, Ruby, Rust, Java, C, C++, Go, and automatic language selection.
+- Browser-local Hall of Shame entries, optional text-to-speech, shareable roast-card rendering, and dark/light themes.
+- Search and social metadata, a crawler policy, sitemap, PWA manifest, repository calls to action, and the supplied ROASTMYCODE emblem.
 
-### Key Features
+The live application is available at [roastmycode-lemon.vercel.app](https://roastmycode-lemon.vercel.app/).
 
-- **Multiple roast personalities:** Choose from distinct reviewer profiles such as Funny, Strict Professor, Hacker, and other built-in modes.
-- **Streaming roast output:** The main roast endpoint proxies a server-sent event stream from Groq so the verdict can appear progressively.
-- **Pain-score dossier:** Review maintainability, readability, chaos, bug probability, spaghetti level, production-crash probability, and related signals.
-- **Emergency refactor:** Ask the AI for a cleaner version of the submitted code and a before/after damage assessment.
-- **Language-aware editor:** Work with JavaScript, TypeScript, Python, Ruby, Rust, Java, C, C++, Go, or automatic detection.
-- **Cursed samples:** Load built-in code examples when you want to test the experience quickly.
-- **Hall of Shame:** Keep a local leaderboard of the most chaotic roasts in the current browser.
-- **Shareable roast cards:** Render a result as an image with `html2canvas` for sharing.
-- **Optional read-aloud mode:** Use the browser's native `SpeechSynthesis` API to hear the roast.
-- **Theme switcher:** Toggle between dark and light presentation modes.
-- **Repository access:** Open the source repository directly from the application header, editor actions, and footer.
+---
 
-### Screenshots and Diagrams
+## <a id="architecture"></a>Architecture
 
-The primary brand mark is included in the repository at [`assets/roastmycode-logo.png`](assets/roastmycode-logo.png). The live interface is available at [roastmycode-lemon.vercel.app](https://roastmycode-lemon.vercel.app/).
-
-The main request flow is:
-
-```text
-Browser editor
-    │
-    ├── POST /api/roast ───────► Vercel Function ───────► Groq Chat Completions
-    │                                  │                         │
-    │                                  └──── streamed SSE ◄──────┘
-    │
-    └── POST /api/refactor ───► Vercel Function ───────► Groq Chat Completions
-                                       │
-                                       └──── JSON response ◄─────┘
+```mermaid
+flowchart LR
+    B[Browser<br/>roastmycode.html] -->|POST /api/roast| R[Vercel Function<br/>api/roast.js]
+    B -->|POST /api/refactor| F[Vercel Function<br/>api/refactor.js]
+    R -->|streamed chat completion| G[Groq Chat Completions API]
+    F -->|JSON chat completion| G
+    R -->|server-sent events| B
+    F -->|JSON content| B
+    B -->|browser-local entries| L[localStorage]
 ```
 
-## Tech Stack
+The frontend is one static HTML document. It calls two Vercel functions, which read `GROQ_API_KEY` from the server environment and proxy requests to Groq using `llama-3.3-70b-versatile`. The client stores Hall of Shame entries in browser `localStorage`; no project database is configured.
 
-| Area | Technology | Role |
+---
+
+## <a id="tech-stack"></a>Tech Stack
+
+| Area | Technology | Repository evidence |
 | --- | --- | --- |
-| Frontend | Semantic HTML, vanilla JavaScript, Tailwind CSS CDN | Single-page interface and responsive layout |
-| Editor | Native `<textarea>` plus custom line numbers | Code entry, tab indentation, language selection, and character count |
-| Highlighting | Prism.js 1.29.0 | Syntax-highlighting support for submitted code and refactor output |
-| Icons | Lucide ESM bundle | Interface iconography |
-| Image export | html2canvas 1.4.1 | Client-side roast-card rendering |
-| Voice | Browser SpeechSynthesis API | Optional read-aloud experience |
-| Backend | Vercel Serverless Functions | Secure proxy layer for AI requests |
-| AI provider | Groq Chat Completions API | Roast and refactor generation using `llama-3.3-70b-versatile` |
-| Hosting configuration | `vercel.json` | Root rewrite and serverless function duration |
-| Data storage | Browser `localStorage` | Local Hall of Shame entries; no application database is configured |
+| Frontend | HTML, CSS, and vanilla JavaScript | `roastmycode.html` |
+| UI utility CSS | Tailwind CSS CDN | `https://cdn.tailwindcss.com` in the application head |
+| Syntax highlighting | Prism.js 1.29.0 | CDN references in the application head |
+| Image export | html2canvas 1.4.1 | CDN reference in the application head |
+| Icons | Lucide ESM CDN import | `lucide@latest` import in the application head |
+| Voice | Browser `SpeechSynthesis` API | Client-side read-aloud controls |
+| Backend | Vercel Serverless Functions | `api/roast.js` and `api/refactor.js` |
+| AI provider | Groq Chat Completions API | Both serverless functions |
+| AI model | `llama-3.3-70b-versatile` | `GROQ_MODEL` constant in both functions |
+| Storage | Browser `localStorage` | Hall of Shame implementation |
+| Automation | GitHub Actions with Node.js 20 | `.github/workflows/validate.yml` |
 
-## Getting Started
+---
+
+## <a id="getting-started"></a>Getting Started
 
 ### Prerequisites
 
-For the frontend shell, you need a modern browser with JavaScript enabled and a local static server. For live AI functionality, you also need a Vercel project and a Groq API key.
+The static interface needs a modern JavaScript-enabled browser and a local static server. The live AI endpoints need a Vercel-compatible serverless runtime and a Groq API key stored as a server environment variable.
 
-| Requirement | Minimum / expectation |
+| Requirement | Why it is needed |
 | --- | --- |
-| Git | Any recent version |
-| Browser | Current Chrome, Firefox, Safari, or Edge |
-| Node.js | Needed by the Vercel CLI; use a current LTS release |
-| Vercel account | Required to deploy the serverless functions |
-| Groq account | Required to create `GROQ_API_KEY` |
+| Git | Clone the repository |
+| Node.js 20 or later | Run the repository validation script and GitHub Actions job |
+| Python 3 or another static server | Preview the static interface locally |
+| Vercel account and CLI | Run or deploy the serverless functions locally and in production |
+| Groq API key | Enable `/api/roast` and `/api/refactor` |
 
 ### Installation
 
 ```bash
 git clone https://github.com/vincenzo-afk/roastmycode.git
 cd roastmycode
+node scripts/validate.mjs
 ```
 
-The repository does not currently include a `package.json` or build step. To preview only the static interface, run a local server from the repository root:
+Preview only the static interface:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then open [http://localhost:8080/roastmycode.html](http://localhost:8080/roastmycode.html). The page will load, but `/api/roast` and `/api/refactor` require a serverless runtime and will not work through a plain static server.
+Then open [http://localhost:8080/roastmycode.html](http://localhost:8080/roastmycode.html). A plain static server does not execute the `/api` functions.
 
 ### Configuration
 
-Copy the example environment file when deploying with Vercel:
+Copy the provided environment template locally if required by your Vercel workflow:
 
 ```bash
 cp .env.example .env
 ```
 
-Set the following value in the Vercel project settings or local Vercel environment:
-
-| Variable | Required | Description |
+| Variable | Required for | Description |
 | --- | --- | --- |
-| `GROQ_API_KEY` | Yes for AI features | Secret key used by the serverless functions to call Groq. Never expose it in browser code. |
+| `GROQ_API_KEY` | AI roasting and refactoring | Groq credential read only by the serverless functions. Keep it out of browser code and commits. |
 
-The client sends `code`, `mode`, and `language` to `/api/roast`, and `code` plus `language` to `/api/refactor`. No database connection, user account, or additional feature flag is currently configured.
+For local function development, install the Vercel CLI and use:
 
-## Usage
+```bash
+npm install --global vercel
+vercel dev
+```
 
-### Roast a code sample
+---
 
-1. Open the website.
-2. Choose a roast personality.
-3. Select a language or leave detection on automatic.
-4. Paste code into the editor, or select **SURPRISE** to load a built-in sample.
-5. Select **INITIATE ROAST**.
-6. Review the streaming roast, pain meter, metrics, verdict, and Hall of Shame controls.
+## <a id="usage"></a>Usage
 
-### Refactor a code sample
+### Roast code
 
-Select **REFACTOR** after entering code. The response includes a short roast, a refactored code block, a damage assessment, and a list of fixes. The refactor flow keeps the requested language where possible.
+1. Open the application and choose a roast mode.
+2. Select a language or leave detection on automatic.
+3. Paste a safe code sample into the editor, or load the built-in surprise sample.
+4. Select **INITIATE ROAST** to receive the streaming structured verdict.
+5. Review the roast, quality metrics, verdict, and optional Hall of Shame controls.
 
-### Share a roast card
+### Refactor code
 
-After a roast completes, use the share/download controls in the results panel. The image is generated in the browser from the hidden roast-card template; no server-side image storage is used.
+Enter a code sample and select **REFACTOR**. The application sends the sample to the refactor endpoint, then presents a brief roast, the refactored code, a before/after damage assessment, and enumerated fixes.
+
+### Share a result
+
+Use the result controls after a roast completes. The application renders its roast-card template in the browser through html2canvas; it does not upload the card to project storage.
 
 ### Documentation
 
-This README is the project documentation. API behavior is documented in the [API Reference](#api-reference), while the interface source is contained in [`roastmycode.html`](roastmycode.html).
+This README is the primary project documentation. Deployment details are below, while contribution and security expectations are in [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 
-## API Reference
+---
+
+## <a id="api-reference"></a>API Reference
+
+Both endpoints accept `POST` only. The Vercel functions use `GROQ_API_KEY` from the server environment to authenticate with Groq; clients do not send a provider key.
+
+| Method | Path | Purpose | Successful response |
+| --- | --- | --- | --- |
+| `POST` | `/api/roast` | Generate a structured roast using the selected persona | Proxied `text/event-stream` response |
+| `POST` | `/api/refactor` | Generate a clean refactor with assessment | JSON object containing `content` |
 
 ### `POST /api/roast`
-
-Proxies a streaming chat completion request to Groq and returns the upstream server-sent event stream.
-
-#### Request body
 
 ```json
 {
@@ -178,27 +185,11 @@ Proxies a streaming chat completion request to Groq and returns the upstream ser
 }
 ```
 
-`code` is required. `mode` selects a built-in system prompt and defaults to the Funny profile when unknown. `language` is optional and defaults to `auto` in the handler.
+`code` is required. `mode` selects a built-in system prompt and falls back to `funny` when not recognized. `language` is optional and defaults to `auto`. The endpoint forwards the Groq streaming response as server-sent events (`text/event-stream`).
 
-#### Response
-
-Successful responses use `Content-Type: text/event-stream` and proxy Groq's streaming chunks. The browser assembles the content and parses the final JSON roast payload.
-
-#### Errors
-
-| Status | Meaning |
-| --- | --- |
-| `400` | No code was provided |
-| `401` / provider status | Groq rejected the configured credentials or request |
-| `405` | Request method was not `POST` |
-| `429` | Groq rate limit was reached |
-| `500` | Missing `GROQ_API_KEY` or an internal proxy failure |
+The requested final payload includes `roast`, a `pain_score` object, `developer_personality`, `code_alignment`, `excuse`, `lore`, `worst_crime`, `git_commit_suggestion`, `humanity_status`, `can_reach_production`, and `verdict`.
 
 ### `POST /api/refactor`
-
-Requests a non-streaming refactor response from Groq.
-
-#### Request body
 
 ```json
 {
@@ -207,7 +198,7 @@ Requests a non-streaming refactor response from Groq.
 }
 ```
 
-#### Response
+Successful responses have this shape:
 
 ```json
 {
@@ -215,118 +206,121 @@ Requests a non-streaming refactor response from Groq.
 }
 ```
 
-The endpoint returns `400`, `405`, provider error statuses, or `500` using the same general error conventions as `/api/roast`.
+### Errors
 
-## Project Structure
+| Status | Condition |
+| --- | --- |
+| `400` | The request body did not include `code`. |
+| `405` | The request used a method other than `POST`. |
+| Provider status | Groq rejected or limited the upstream request. |
+| `500` | `GROQ_API_KEY` is absent or an internal proxy failure occurred. |
+
+---
+
+## <a id="project-structure"></a>Project Structure
 
 ```text
 roastmycode/
+├── .github/
+│   ├── ISSUE_TEMPLATE/        # Bug and feature request forms
+│   ├── workflows/validate.yml # Dependency-free validation workflow
+│   ├── CODEOWNERS             # Verified repository owner
+│   └── PULL_REQUEST_TEMPLATE.md
 ├── api/
-│   ├── refactor.js          # Vercel function for emergency refactors
-│   └── roast.js             # Vercel function for streamed roast responses
+│   ├── refactor.js            # Non-streaming Groq refactor proxy
+│   └── roast.js               # Streaming Groq roast proxy
 ├── assets/
-│   └── roastmycode-logo.png # Supplied brand emblem used by the app and README
-├── .env.example             # Environment variable template
-├── .gitignore               # Local secrets and generated files excluded from Git
-├── ideas.md                 # Chosen visual direction and brand system
-├── roastmycode.html         # Complete frontend application
-├── robots.txt               # Crawler policy and sitemap reference
-├── sitemap.xml              # Canonical public URL for search engines
-├── site.webmanifest         # Installable metadata and app icon
-└── vercel.json              # Root rewrite and serverless function settings
+│   └── roastmycode-logo.png   # Product emblem
+├── scripts/
+│   └── validate.mjs           # Source/configuration validation
+├── .env.example               # GROQ_API_KEY template
+├── CONTRIBUTING.md            # Contribution workflow
+├── README.md                  # Project documentation
+├── SECURITY.md                # Vulnerability reporting policy
+├── roastmycode.html           # Complete browser application
+├── robots.txt                 # Crawler policy
+├── site.webmanifest           # Installable app metadata
+├── sitemap.xml                # Homepage sitemap
+└── vercel.json                # Vercel routing and function duration
 ```
 
-## Roadmap and Limitations
+---
 
-### Current capabilities
+## <a id="features-and-limitations"></a>Features and Limitations
 
-- [x] Multi-personality AI roast flow
-- [x] Streaming roast output
-- [x] Emergency refactor flow
-- [x] Pain scores and verdict rendering
-- [x] Local Hall of Shame
-- [x] Shareable roast-card generation
-- [x] Theme toggle and browser speech output
-- [x] Brand emblem, repository CTAs, favicon, and social metadata
+### Current features
+
+- ✅ AI roast and emergency refactor flows through Groq.
+- ✅ Streamed roast output, structured result fields, and pain-score metrics.
+- ✅ Multiple roast personas and language choices.
+- ✅ Shareable image cards, browser speech, themes, and a local Hall of Shame.
+- ✅ SEO metadata, sitemap, robots policy, app manifest, and repository links.
+- ✅ GitHub Actions validation for tracked configuration and common credential patterns.
 
 ### Known limitations
 
-- There is no automated test suite or coverage pipeline in the current repository.
-- The Hall of Shame is browser-local and is not a global leaderboard.
-- AI availability depends on Groq credentials, provider limits, network access, and Vercel function execution.
-- The frontend is intentionally a single HTML file, which keeps deployment simple but makes larger feature work harder to maintain.
-- The canonical URL and sitemap assume `https://roastmycode-lemon.vercel.app/`; update them if the production domain changes.
+- There is no package manifest, dependency lockfile, automated browser test suite, or coverage report.
+- The Hall of Shame is local to a browser and is not a shared or authenticated leaderboard.
+- AI response availability depends on Groq service behavior, valid server configuration, and Vercel function execution.
+- The external CDN resources are not currently integrity-pinned.
+- No project license file is present, so reuse rights are not specified.
 
-### Future improvements
+The repository has no published releases or changelog at this time. Commit history is available on the [main branch](https://github.com/vincenzo-afk/roastmycode/commits/main).
 
-- Add automated browser tests for the roast, refactor, share, and theme flows.
-- Add a persistent backend for opt-in public leaderboards.
-- Add CSP and tighter dependency pinning for CDN resources.
-- Split the frontend into maintainable modules without changing the current user experience.
+---
 
-## Testing
+## <a id="testing-and-continuous-integration"></a>Testing and Continuous Integration
 
-No automated test framework or coverage report is configured in the repository at this time. The minimum manual smoke test is:
-
-1. Serve the site locally or open the deployed URL.
-2. Verify the logo, theme toggle, repo links, editor, language selector, and built-in sample button.
-3. With `GROQ_API_KEY` configured in a Vercel environment, submit a short sample to both `/api/roast` and `/api/refactor`.
-4. Confirm the stream completes, metrics render, the refactor result is readable, and the share/download control responds.
-5. Check the browser console for blocked CDN assets or runtime errors.
-
-## Deployment
-
-### Vercel
-
-The repository is configured for Vercel. Import the GitHub repository into Vercel, set `GROQ_API_KEY` in the project environment variables, and deploy. The existing [`vercel.json`](vercel.json) rewrites `/` to `roastmycode.html` and allows the API functions to run within the Vercel Hobby-plan duration limit.
-
-For local serverless testing, install the Vercel CLI and run:
+Run the project validator before opening a pull request:
 
 ```bash
-npm install --global vercel
-vercel dev
+node scripts/validate.mjs
 ```
 
-### Other hosts
+The validation checks tracked files, Vercel routing, manifest JSON, crawl metadata, expected server-side credential use, and common token patterns. GitHub Actions runs this same command on pushes and pull requests targeting `main`.
 
-Static hosting can serve the HTML, `assets/`, `robots.txt`, `sitemap.xml`, and manifest files, but the AI endpoints need an equivalent serverless or backend implementation. Do not place `GROQ_API_KEY` in client-side JavaScript.
+Manual testing remains necessary for the interactive editor, browser sharing, speech synthesis, server-sent event handling, and successful Groq responses. There is no configured automated browser test or code-coverage workflow.
 
-## Contributing
+---
 
-Contributions are welcome through GitHub issues and pull requests.
+## <a id="deployment"></a>Deployment
 
-1. Fork the repository.
-2. Create a focused branch, for example `feat/roast-history` or `fix/mobile-editor`.
-3. Keep API keys and local environment files out of commits.
-4. Test the static page and any changed API behavior manually.
-5. Open a pull request with a concise description, screenshots for visible UI changes, and validation steps.
+The repository is configured for Vercel. Import the GitHub repository into Vercel, set `GROQ_API_KEY` in the project environment settings, and deploy. The provided [`vercel.json`](vercel.json) rewrites `/` to `roastmycode.html` and configures a 10-second maximum duration for files matching `api/*.js`.
 
-Use imperative commit subjects such as `Add roast card export fallback` or `Fix refactor error state`. There is no separate pull request template or code-of-conduct file in the current repository.
+Static hosts can serve the HTML, logo, manifest, robots policy, and sitemap. They cannot execute the existing `/api/roast` or `/api/refactor` Vercel functions without an equivalent serverless implementation.
 
-## Security
+---
 
-Report suspected vulnerabilities privately to the repository owner before opening a public issue. Do not include API keys, private code samples, or personal data in an issue.
+## <a id="contributing"></a>Contributing
 
-The current security model keeps `GROQ_API_KEY` in the serverless environment rather than browser JavaScript. Contributors should also avoid committing `.env` files, use least-privilege provider credentials, rotate exposed keys immediately, and review third-party CDN changes before production use.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening an issue or pull request. In short, use a focused branch, keep commits concise and imperative, run `node scripts/validate.mjs`, test the affected behavior manually, and avoid committing keys or private code samples.
 
-## License
+The repository now provides structured [bug](https://github.com/vincenzo-afk/roastmycode/issues/new?template=bug_report.yml) and [feature-request](https://github.com/vincenzo-afk/roastmycode/issues/new?template=feature_request.yml) forms, plus a pull-request checklist.
 
-No license file is currently included in the repository. Until a license is added by the project owner, reuse, redistribution, and modification permissions should be treated as **not specified**. Open an issue with the owner if you need a formal license for a contribution or downstream use.
+---
 
-## Acknowledgments
+## <a id="security"></a>Security
 
-- [Groq](https://groq.com/) for the chat-completions API used by the serverless functions.
-- [Vercel](https://vercel.com/) for the deployment model and serverless runtime configuration.
-- [Prism](https://prismjs.com/) for syntax-highlighting support.
-- [html2canvas](https://html2canvas.hertzen.com/) for client-side roast-card rendering.
-- [Lucide](https://lucide.dev/) for interface icons.
+Read [SECURITY.md](SECURITY.md) for the supported branch and private reporting route. Do not submit credentials or sensitive source code in public issues. The serverless functions intentionally read `GROQ_API_KEY` only from the deployment environment.
+
+---
+
+## <a id="license"></a>License
+
+No `LICENSE` file is currently included. The repository does not specify reuse, redistribution, or modification permissions. Contact the repository owner before relying on permissions that are not granted in a future license file.
+
+---
+
+## <a id="acknowledgments"></a>Acknowledgments
+
+ROASTMYCODE uses [Groq](https://groq.com/) for chat completions, [Vercel](https://vercel.com/) for serverless deployment, [Prism](https://prismjs.com/) for code highlighting, [html2canvas](https://html2canvas.hertzen.com/) for client-side card rendering, [Lucide](https://lucide.dev/) for icons, and the supplied ROASTMYCODE emblem for the project identity.
 
 ---
 
 <div align="center">
 
-[Back to top](#roastmycode) · [GitHub](https://github.com/vincenzo-afk/roastmycode) · [Issues](https://github.com/vincenzo-afk/roastmycode/issues)
+[Back to top](#roastmycode) · [GitHub repository](https://github.com/vincenzo-afk/roastmycode) · [Live application](https://roastmycode-lemon.vercel.app/) · [Security policy](SECURITY.md)
 
-Built with code, judgment, and a suspicious amount of terminal heat by [vincenzo-afk](https://github.com/vincenzo-afk).
+Built by [vincenzo-afk](https://github.com/vincenzo-afk).
 
 </div>

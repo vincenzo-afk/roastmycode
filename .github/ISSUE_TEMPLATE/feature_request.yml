@@ -1,0 +1,31 @@
+name: Feature request
+description: Propose a focused improvement to ROASTMYCODE.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the user problem first. Do not include credentials, private code, or sensitive information.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What developer workflow or user problem would this improve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful change.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
