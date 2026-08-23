@@ -21,6 +21,7 @@
 ## <a id="table-of-contents"></a>Table of Contents
 
 - [About](#about)
+- [Launch Video](#launch-video)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
@@ -53,6 +54,16 @@ The project does not replace static analysis, testing, security scanning, or hum
 - Search and social metadata, a crawler policy, sitemap, PWA manifest, repository calls to action, and the supplied ROASTMYCODE emblem.
 
 The live application is available at [roastmycode-lemon.vercel.app](https://roastmycode-lemon.vercel.app/).
+
+---
+
+## <a id="launch-video"></a>Launch Video
+
+[![Watch the ROASTMYCODE product-launch video](assets/roastmycode-product-launch-poster.png)](assets/roastmycode-product-launch.mp4)
+
+> **Watch the 27-second ROASTMYCODE launch video.** The linked MP4 follows the product flow from code input and evidence scan through the verdict, emergency refactor, live application, and GitHub repository call to action.
+
+The video and its poster are versioned in [`assets/`](assets/). Select the preview above to open the MP4 in GitHub’s file viewer or download the source file directly.
 
 ---
 
@@ -230,7 +241,9 @@ roastmycode/
 │   ├── refactor.js            # Non-streaming Groq refactor proxy
 │   └── roast.js               # Streaming Groq roast proxy
 ├── assets/
-│   └── roastmycode-logo.png   # Product emblem
+│   ├── roastmycode-logo.png                  # Product emblem
+│   ├── roastmycode-product-launch-poster.png # README video preview
+│   └── roastmycode-product-launch.mp4        # 27-second product-launch video
 ├── scripts/
 │   └── validate.mjs           # Source/configuration validation
 ├── .env.example               # GROQ_API_KEY template
